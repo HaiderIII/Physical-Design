@@ -289,22 +289,67 @@ ROW ROW_281 FreePDK45_38x28_10R_NP_162NW_34O 100320 887600 FS DO 2104 BY 1 STEP 
 ROW ROW_282 FreePDK45_38x28_10R_NP_162NW_34O 100320 890400 N DO 2104 BY 1 STEP 380 0 ;
 ROW ROW_283 FreePDK45_38x28_10R_NP_162NW_34O 100320 893200 FS DO 2104 BY 1 STEP 380 0 ;
 ROW ROW_284 FreePDK45_38x28_10R_NP_162NW_34O 100320 896000 N DO 2104 BY 1 STEP 380 0 ;
+TRACKS X 0 DO 2632 STEP 380 LAYER metal1 ;
+TRACKS Y 380 DO 2631 STEP 380 LAYER metal1 ;
+TRACKS X 0 DO 2632 STEP 380 LAYER metal2 ;
+TRACKS Y 380 DO 2631 STEP 380 LAYER metal2 ;
+TRACKS X 0 DO 2632 STEP 380 LAYER metal3 ;
+TRACKS Y 380 DO 2631 STEP 380 LAYER metal3 ;
 COMPONENTS 0 ;
 END COMPONENTS
 PINS 13 ;
-    - a[0] + NET a[0] + DIRECTION INPUT + USE SIGNAL ;
-    - a[1] + NET a[1] + DIRECTION INPUT + USE SIGNAL ;
-    - a[2] + NET a[2] + DIRECTION INPUT + USE SIGNAL ;
-    - a[3] + NET a[3] + DIRECTION INPUT + USE SIGNAL ;
-    - b[0] + NET b[0] + DIRECTION INPUT + USE SIGNAL ;
-    - b[1] + NET b[1] + DIRECTION INPUT + USE SIGNAL ;
-    - b[2] + NET b[2] + DIRECTION INPUT + USE SIGNAL ;
-    - b[3] + NET b[3] + DIRECTION INPUT + USE SIGNAL ;
-    - cout + NET b[0] + DIRECTION OUTPUT + USE SIGNAL ;
-    - sum[0] + NET a[0] + DIRECTION OUTPUT + USE SIGNAL ;
-    - sum[1] + NET a[1] + DIRECTION OUTPUT + USE SIGNAL ;
-    - sum[2] + NET a[2] + DIRECTION OUTPUT + USE SIGNAL ;
-    - sum[3] + NET a[3] + DIRECTION OUTPUT + USE SIGNAL ;
+    - a[0] + NET a[0] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 999930 538460 ) N ;
+    - a[1] + NET a[1] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 845120 999930 ) N ;
+    - a[2] + NET a[2] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 1520 70 ) N ;
+    - a[3] + NET a[3] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 70 308180 ) N ;
+    - b[0] + NET b[0] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 999930 845500 ) N ;
+    - b[1] + NET b[1] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 70 922260 ) N ;
+    - b[2] + NET b[2] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 231040 999930 ) N ;
+    - b[3] + NET b[3] + DIRECTION INPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 999930 231420 ) N ;
+    - cout + NET b[0] + DIRECTION OUTPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 307800 70 ) N ;
+    - sum[0] + NET a[0] + DIRECTION OUTPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 614840 70 ) N ;
+    - sum[1] + NET a[1] + DIRECTION OUTPUT + USE SIGNAL
+      + PORT
+        + LAYER metal3 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 70 615220 ) N ;
+    - sum[2] + NET a[2] + DIRECTION OUTPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 921880 70 ) N ;
+    - sum[3] + NET a[3] + DIRECTION OUTPUT + USE SIGNAL
+      + PORT
+        + LAYER metal2 ( -70 -70 ) ( 70 70 )
+        + PLACED ( 538080 999930 ) N ;
 END PINS
 NETS 8 ;
     - a[0] ( PIN sum[0] ) ( PIN a[0] ) + USE SIGNAL ;

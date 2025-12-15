@@ -1,143 +1,140 @@
-# Example 2 : Contrôle des metal layers
-# ======================================
-#
-# Objectif : Démontrer l'impact du choix de layers sur le placement
+# Example 2 : Strategic I/O Pin Placement
+# ========================================
 
 puts "\n========================================="
-puts "Example 2 : Layer Assignment Control"
+puts "Example 2 : Strategic Pin Placement"
 puts "=========================================\n"
 
-# Créer un design avec plus de pins
-puts "Step 1: Creating 8-bit design..."
-set netlist_content {module alu8 (
-    input clk,
-    input rst,
-    input [7:0] data_in,
-    input [2:0] opcode,
-    output [7:0] result,
-    output valid
-);
-    reg [7:0] result_reg;
-    reg valid_reg;
-    
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            result_reg <= 8'h00;
-            valid_reg <= 1'b0;
-        end else begin
-            case (opcode)
-                3'b000: result_reg <= data_in;
-                3'b001: result_reg <= ~data_in;
-                default: result_reg <= 8'h00;
-            endcase
-            valid_reg <= 1'b1;
-        end
-    end
-    
-    assign result = result_reg;
-    assign valid = valid_reg;
-endmodule
+set TECH_DIR "resources/tech/nangate45"
+set RESOURCE_DIR "phases/phase1_floorplanning/lessons/lesson02_io_placement/resources"
+set RESULTS_DIR "phases/phase1_floorplanning/lessons/lesson02_io_placement/examples/results"
+
+file mkdir $RESULTS_DIR
+
+proc reload_design {tech_dir resource_dir} {
+    clear
+    read_lef ${tech_dir}/Nangate45.lef
+    read_liberty ${tech_dir}/Nangate45_typ.lib
+    read_verilog ${resource_dir}/alu8.v
+    link_design alu8
 }
 
-set fp [open "example2_design.v" w]
-puts $fp $netlist_content
-close $fp
-puts "  -> Design: 8-bit ALU"
-puts "  -> Pins: 2 control + 8 inputs + 3 opcode + 8 outputs + 1 valid = 22 total"
+proc create_floorplan_with_tracks {} {
+    initialize_floorplan \
+        -die_area {0 0 800 800} \
+        -core_area {50 50 750 750} \
+        -site FreePDK45_38x28_10R_NP_162NW_34O
+    
+    # Add tracks based on LEF data:
+    # metal1: HORIZONTAL, PITCH 0.14, OFFSET 0.07
+    # metal2: VERTICAL, PITCH 0.19, OFFSET 0.095
+    # metal3: HORIZONTAL, PITCH 0.28, OFFSET 0.14
+    
+    make_tracks metal1 -x_offset 0.07 -x_pitch 0.14 -y_offset 0.07 -y_pitch 0.14
+    make_tracks metal2 -x_offset 0.095 -x_pitch 0.19 -y_offset 0.095 -y_pitch 0.19
+    make_tracks metal3 -x_offset 0.14 -x_pitch 0.28 -y_offset 0.14 -y_pitch 0.28
+}
 
-# Charger
-puts "\nStep 2: Loading design..."
-read_verilog example2_design.v
-link_design alu8
+# ============================================
+# SCENARIO A: Random Placement (Baseline)
+# ============================================
+puts "\n=================================================="
+puts "SCENARIO A: Random placement (baseline)"
+puts "==================================================\n"
 
-# Floorplan
-puts "\nStep 3: Creating floorplan (800x800 um)..."
-initialize_floorplan \
-    -die_area "0 0 800 800" \
-    -core_area "100 100 700 700" \
-    -site FreePDK45_38x28_10R_NP_162NW_34O
+reload_design $TECH_DIR $RESOURCE_DIR
+create_floorplan_with_tracks
 
-puts "\n========================================="
-puts "SCENARIO A: All pins on M3 (thin layer)"
-puts "=========================================\n"
+puts "  All pins randomly distributed\n"
 
-place_pins \
-    -hor_layers met3 \
-    -ver_layers met3 \
-    -random \
-    -random_seed 100
+# metal1=horizontal, metal2=vertical (from LEF DIRECTION)
+place_pins -hor_layers metal1 -ver_layers metal2 -random
 
-write_def example2_scenario_a.def
-puts "  ✓ Exported: example2_scenario_a.def"
-puts "  → Problem: M3 is thin, high resistance for I/O"
-puts "  → Risk: Routing congestion with internal signals"
+write_def ${RESULTS_DIR}/example2_scenario_a.def
+puts "  ✓ Saved: random placement\n"
 
-puts "\n========================================="
-puts "SCENARIO B: Optimal layer assignment"
-puts "=========================================\n"
+# ============================================
+# SCENARIO B: Functional Grouping
+# ============================================
+puts "\n=================================================="
+puts "SCENARIO B: Functional grouping"
+puts "==================================================\n"
 
-Reload to reset
-read_verilog example2_design.v
-link_design alu8
-initialize_floorplan \
-    -die_area "0 0 800 800" \
-    -core_area "100 100 700 700" \
-    -site FreePDK45_38x28_10R_NP_162NW_34O
+reload_design $TECH_DIR $RESOURCE_DIR
+create_floorplan_with_tracks
 
-place_pins \
-    -hor_layers met5 \
-    -ver_layers met3 \
-    -random \
-    -random_seed 100
+puts "  Grouping related signals by function\n"
 
-write_def example2_scenario_b.def
-puts "  ✓ Exported: example2_scenario_b.def"
-puts "  → M5 for horizontal (top/bottom): Thick, low resistance"
-puts "  → M3 for vertical (left/right): Adequate, avoids M1/M2"
+# Data inputs on LEFT (vertical edge → metal2)
+set_io_pin_constraint -pin_names {data_in[*]} -region left:*
 
-puts "\n========================================="
-puts "SCENARIO C: Maximum performance (M7)"
-puts "=========================================\n"
+# Results on RIGHT (vertical edge → metal2)
+set_io_pin_constraint -pin_names {result[*] valid} -region right:*
 
-Reload
-read_verilog example2_design.v
-link_design alu8
-initialize_floorplan \
-    -die_area "0 0 800 800" \
-    -core_area "100 100 700 700" \
-    -site FreePDK45_38x28_10R_NP_162NW_34O
+# Control signals on BOTTOM (horizontal edge → metal1)
+set_io_pin_constraint -pin_names {opcode[*]} -region bottom:*
 
-Clock and critical signals on M7
-set_io_pin_constraint -pin_name "clk" -region "top:*" -layer met7
-set_io_pin_constraint -pin_name "rst" -region "top:*" -layer met7
+# Clock/Reset on TOP (horizontal edge → metal1)
+set_io_pin_constraint -pin_names {clk rst} -region top:*
 
-Other pins on M5/M3
-place_pins \
-    -hor_layers met5 \
-    -ver_layers met3 \
-    -random \
-    -random_seed 100
+place_pins -hor_layers metal1 -ver_layers metal2 -random
 
-write_def example2_scenario_c.def
-puts "  ✓ Exported: example2_scenario_c.def"
-puts "  → Critical signals (clk, rst) on M7: Maximum thickness"
-puts "  → Other signals on M5/M3: Good balance"
+write_def ${RESULTS_DIR}/example2_scenario_b.def
+puts "  ✓ Saved: functional grouping\n"
 
-puts "\n========================================="
-puts "Layer Comparison Summary"
-puts "=========================================\n"
+# ============================================
+# SCENARIO C: Ordered Bus Placement
+# ============================================
+puts "\n=================================================="
+puts "SCENARIO C: Ordered bus placement"
+puts "==================================================\n"
 
-puts "| Layer | Thickness | Resistance | Use Case              |"
-puts "|-------|-----------|------------|-----------------------|"
-puts "| M1    | 0.14 µm   | HIGH       | Intra-cell only       |"
-puts "| M2    | 0.14 µm   | HIGH       | Local routing         |"
-puts "| M3    | 0.30 µm   | MEDIUM     | I/O minimum           |"
-puts "| M5    | 0.80 µm   | LOW        | I/O recommended       |"
-puts "| M7    | 1.60 µm   | VERY LOW   | Power / Critical I/O  |"
+reload_design $TECH_DIR $RESOURCE_DIR
+create_floorplan_with_tracks
 
-puts "\nRecommendation:"
-puts "  ✓ Use M5 for horizontal I/O pins (top/bottom edges)"
-puts "  ✓ Use M3 for vertical I/O pins (left/right edges)"
-puts "  ✓ Use M7 for clock and critical signals"
+puts "  Buses ordered MSB→LSB for clean routing\n"
 
-puts "\nNext: See example3_constraints.tcl for constraint-driven placement"
+# Ordered data inputs (LEFT - vertical)
+set_io_pin_constraint -pin_names {data_in[7] data_in[6] data_in[5] data_in[4] data_in[3] data_in[2] data_in[1] data_in[0]} -region left:*
+
+# Ordered results (RIGHT - vertical)
+set_io_pin_constraint -pin_names {result[7] result[6] result[5] result[4] result[3] result[2] result[1] result[0] valid} -region right:*
+
+# Ordered opcode (BOTTOM - horizontal)
+set_io_pin_constraint -pin_names {opcode[2] opcode[1] opcode[0]} -region bottom:*
+
+# Clock/Reset (TOP - horizontal)
+set_io_pin_constraint -pin_names {clk rst} -region top:*
+
+place_pins -hor_layers metal1 -ver_layers metal2 -random
+
+write_def ${RESULTS_DIR}/example2_scenario_c.def
+puts "  ✓ Saved: ordered buses\n"
+
+# ============================================
+# Summary
+# ============================================
+puts "\n=================================================="
+puts "Summary"
+puts "==================================================\n"
+
+puts "✓ Generated 3 placement strategies:"
+puts "  A. Random uniform distribution"
+puts "  B. Functional grouping (data/control/clock)"
+puts "  C. Ordered buses (MSB→LSB)\n"
+
+puts "📊 Layer assignments (from LEF DIRECTION):"
+puts "  • Horizontal edges (top/bottom): metal1 (HORIZONTAL)"
+puts "  • Vertical edges (left/right): metal2 (VERTICAL)\n"
+
+puts "💡 Compare results:"
+puts "  • Scenario A: Pins scattered randomly"
+puts "  • Scenario B: Logical grouping by function"
+puts "  • Scenario C: Bus bits ordered sequentially\n"
+
+puts "💡 To visualize:"
+puts "  openroad -gui"
+puts "  read_lef resources/tech/nangate45/Nangate45.lef"
+puts "  read_def phases/.../results/example2_scenario_c.def\n"
+
+puts "✓ Example 2 completed!\n"
