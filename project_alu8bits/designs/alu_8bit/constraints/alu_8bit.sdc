@@ -35,5 +35,5 @@ set_load 0.05 [all_outputs]
 set_operating_conditions -analysis_type on_chip_variation
 
 # Don't touch reset network
-set_dont_touch_network [get_ports rst_n]
-set_dont_touch_network [get_ports clk]
+#set_dont_touch_network [get_ports rst_n]
+#set_dont_touch_network [get_ports clk]

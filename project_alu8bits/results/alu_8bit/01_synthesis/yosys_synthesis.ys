@@ -1,0 +1,8 @@
+read_verilog /home/faiz/projects/Physical-Design/project_alu8bits/designs/alu_8bit/rtl/alu_8bit.v
+hierarchy -check -top alu_8bit
+synth -top alu_8bit
+dfflibmap -liberty /home/faiz/.volare/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty /home/faiz/.volare/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+clean
+write_verilog -noattr /home/faiz/projects/Physical-Design/project_alu8bits/results/alu_8bit/01_synthesis/alu_8bit_synth.v
+stat -liberty /home/faiz/.volare/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
