@@ -1,0 +1,19 @@
+==========================================
+   ALU 8-BIT SIGN-OFF SUMMARY
+==========================================
+
+Design: alu_8bit
+Technology: Sky130 HD
+Clock Period: 20 ns (50 MHz)
+
+TIMING:
+  Setup Slack: 15.194137933446347 ns
+  Hold Slack: 1.1221585089881994 ns
+  TNS: 0.00 ns
+
+CHECKS:
+  Total: 7
+  Passed: 7
+  Failed: 0
+
+STATUS: APPROVED FOR TAPE-OUT
