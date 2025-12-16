@@ -1,0 +1,5 @@
+Optimization Timing Summary
+===========================
+
+worst slack max 15.06
+worst slack min 1.12
