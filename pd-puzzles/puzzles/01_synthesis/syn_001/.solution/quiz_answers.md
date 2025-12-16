@@ -76,21 +76,21 @@ Le fichier LEF (réponse A) définit la géométrie physique.
 
 Le script est dans :
 ```
-pd-dojo/puzzles/01_synthesis/syn_001/run.tcl
+pd-puzzles/puzzles/01_synthesis/syn_001/run.tcl
 ```
 
-Pour atteindre `pd-dojo/` (dojo_root) :
+Pour atteindre `pd-puzzles/` (dojo_root) :
 ```tcl
-set script_dir "/.../pd-dojo/puzzles/01_synthesis/syn_001"
+set script_dir "/.../pd-puzzles/puzzles/01_synthesis/syn_001"
 
 file dirname $script_dir
-# -> "/.../pd-dojo/puzzles/01_synthesis"
+# -> "/.../pd-puzzles/puzzles/01_synthesis"
 
 file dirname [file dirname $script_dir]
-# -> "/.../pd-dojo/puzzles"
+# -> "/.../pd-puzzles/puzzles"
 
 file dirname [file dirname [file dirname $script_dir]]
-# -> "/.../pd-dojo"  <- dojo_root!
+# -> "/.../pd-puzzles"  <- dojo_root!
 ```
 
 ---

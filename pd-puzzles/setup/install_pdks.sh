@@ -1,8 +1,8 @@
 #!/bin/bash
 #===============================================================================
-# PD-Dojo PDK Installation Script
+# PD-Puzzles PDK Installation Script
 #===============================================================================
-# This script installs the three pedagogical PDKs used in PD-Dojo:
+# This script installs the three pedagogical PDKs used in PD-Puzzles:
 #   - Nangate45 (beginner puzzles)
 #   - Sky130 (intermediate puzzles)
 #   - ASAP7 (advanced puzzles)
@@ -19,7 +19,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOJO_ROOT="$(dirname "$SCRIPT_DIR")"
 PDK_DIR="$DOJO_ROOT/common/pdks"
-CACHE_DIR="$HOME/.pd-dojo/cache"
+CACHE_DIR="$HOME/.pd-puzzles/cache"
 
 # Git repositories
 ORFS_REPO="https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts.git"
@@ -38,7 +38,7 @@ NC='\033[0m' # No Color
 #-------------------------------------------------------------------------------
 print_header() {
     echo -e "\n${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  🥋 ${BLUE}PD-Dojo PDK Installer${NC}                                      ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  🥋 ${BLUE}PD-Puzzles PDK Installer${NC}                                   ${CYAN}║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}\n"
 }
 
@@ -66,7 +66,7 @@ usage() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Install PDKs for PD-Dojo puzzles.
+Install PDKs for PD-Puzzles.
 
 Options:
     --nangate45     Install Nangate45 PDK only (beginner puzzles)
@@ -181,7 +181,7 @@ install_nangate45() {
 
 **Source**: OpenROAD-flow-scripts
 **Technology**: 45nm FreePDK
-**Usage in PD-Dojo**: Beginner puzzles (Level: Green)
+**Usage in PD-Puzzles**: Beginner puzzles (Level: Green)
 
 ## Key Files
 - \`lef/NangateOpenCellLibrary.lef\` - Library LEF
@@ -221,7 +221,7 @@ install_sky130() {
 
 **Source**: SkyWater / Google + OpenROAD-flow-scripts
 **Technology**: 130nm SkyWater
-**Usage in PD-Dojo**: Intermediate puzzles (Level: Yellow)
+**Usage in PD-Puzzles**: Intermediate puzzles (Level: Yellow)
 
 ## Key Files
 - \`lef/sky130_fd_sc_hd.tlef\` - Tech LEF
@@ -261,7 +261,7 @@ install_asap7() {
 
 **Source**: Arizona State University + OpenROAD-flow-scripts
 **Technology**: 7nm predictive PDK
-**Usage in PD-Dojo**: Advanced puzzles (Level: Red)
+**Usage in PD-Puzzles**: Advanced puzzles (Level: Red)
 
 ## Key Files
 - \`lef/asap7_tech_1x_201209.lef\` - Tech LEF

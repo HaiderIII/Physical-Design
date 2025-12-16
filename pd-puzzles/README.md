@@ -1,4 +1,4 @@
-# 🥋 PD-Dojo
+# 🥋 PD-Puzzles
 
 **Physical Design Puzzle Challenges with OpenROAD**
 
@@ -41,7 +41,7 @@ Apprendre à résoudre les problèmes **réels** rencontrés par les ingénieurs
 ## 📁 Structure
 
 ```
-pd-dojo/
+pd-puzzles/
 ├── setup/                  # Installation des PDKs
 ├── tcl_fundamentals/       # Cours TCL avant les puzzles
 ├── puzzles/

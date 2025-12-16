@@ -33,7 +33,7 @@ Cela signifie qu'OpenROAD cherche le fichier Liberty dans un dossier appelé `li
 
 Le PDK Nangate45 est installé dans :
 ```
-pd-dojo/common/pdks/nangate45/
+pd-puzzles/common/pdks/nangate45/
 ```
 
 La structure est :
@@ -66,7 +66,7 @@ Regardez ces lignes dans le script :
 set dojo_root [file dirname [file dirname [file dirname $script_dir]]]
 ```
 
-Cette ligne calcule le chemin vers la racine de pd-dojo.
+Cette ligne calcule le chemin vers la racine de pd-puzzles.
 
 Ensuite, le problème est ici :
 ```tcl

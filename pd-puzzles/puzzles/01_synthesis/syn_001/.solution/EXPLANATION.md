@@ -22,9 +22,9 @@ Il essayait d'ouvrir `liberty/NangateOpenCellLibrary_typical.lib`, un chemin **r
 ### Pourquoi ça échouait
 
 ```
-Répertoire courant : /home/user/pd-dojo/puzzles/01_synthesis/syn_001/
-Chemin cherché     : /home/user/pd-dojo/puzzles/01_synthesis/syn_001/liberty/
-Chemin réel du PDK : /home/user/pd-dojo/common/pdks/nangate45/
+Répertoire courant : /home/user/pd-puzzles/puzzles/01_synthesis/syn_001/
+Chemin cherché     : /home/user/pd-puzzles/puzzles/01_synthesis/syn_001/liberty/
+Chemin réel du PDK : /home/user/pd-puzzles/common/pdks/nangate45/
 ```
 
 Le dossier `liberty/` n'existe tout simplement pas dans `syn_001/`.
@@ -163,7 +163,7 @@ set script_dir [file dirname [info script]]
 
 ```tcl
 # FAUX : Ne fonctionnera que sur votre machine
-set pdk_dir "/home/alice/pd-dojo/common/pdks/nangate45"
+set pdk_dir "/home/alice/pd-puzzles/common/pdks/nangate45"
 
 # CORRECT : Chemin relatif au script
 set pdk_dir "$dojo_root/common/pdks/nangate45"
@@ -215,6 +215,6 @@ check_file $cell_lef "Cell LEF"
 
 ---
 
-**Félicitations !** 🎉 Vous avez complété le premier puzzle de PD-Dojo !
+**Félicitations !** 🎉 Vous avez complété le premier puzzle de PD-Puzzles !
 
 **Prochain puzzle** : `syn_002` - Clock Constraints Challenge
