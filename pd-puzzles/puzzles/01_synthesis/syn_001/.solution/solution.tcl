@@ -24,8 +24,8 @@ puts "Script directory: $script_dir"
 puts "Puzzle directory: $puzzle_dir"
 puts "Dojo root: $dojo_root"
 
-# Design files
-set design_file "$puzzle_dir/resources/counter.v"
+# Design files (use pre-synthesized netlist for OpenROAD)
+set design_file "$puzzle_dir/resources/counter_netlist.v"
 set sdc_file "$puzzle_dir/resources/constraints.sdc"
 
 # Results directory

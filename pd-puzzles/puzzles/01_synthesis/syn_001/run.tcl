@@ -23,7 +23,10 @@ puts "Script directory: $script_dir"
 puts "Dojo root: $dojo_root"
 
 # Design files (these are correct)
-set design_file "$script_dir/resources/counter.v"
+# Note: We use a pre-synthesized netlist because OpenROAD's read_verilog
+# expects gate-level Verilog, not RTL. In a real flow, you would first
+# synthesize with Yosys, then import the netlist into OpenROAD.
+set design_file "$script_dir/resources/counter_netlist.v"
 set sdc_file "$script_dir/resources/constraints.sdc"
 
 # Results directory
