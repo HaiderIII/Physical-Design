@@ -42,7 +42,7 @@ file mkdir $results_dir
 #       The current path "liberty/" is WRONG - it's a relative path that
 #       doesn't exist. You need to construct the FULL path to the PDK files.
 
-set pdk_dir "liberty"  ;# <-- THIS IS WRONG! Fix this line
+set pdk_dir "$dojo_root/common/pdks/nangate45"  ;# <-- THIS IS WRONG! Fix this line
 
 # Liberty file (timing library)
 set lib_file "$pdk_dir/lib/NangateOpenCellLibrary_typical.lib"

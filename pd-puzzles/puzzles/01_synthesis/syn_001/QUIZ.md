@@ -15,7 +15,7 @@
 
 **D)** Le fichier Verilog avait une erreur de syntaxe
 
----
+---B---
 
 ## Question 2 : Quelle commande TCL permet de construire un chemin de fichier de manière portable ?
 
@@ -27,7 +27,7 @@
 
 **D)** `path_combine $dir $file`
 
----
+---C---
 
 ## Question 3 : Dans un script OpenROAD, pourquoi est-il préférable d'utiliser des chemins absolus plutôt que relatifs ?
 
@@ -39,7 +39,7 @@
 
 **D)** Les chemins absolus sont plus rapides à parser
 
----
+---C---
 
 ## Question 4 : Quel est le rôle du fichier Liberty (.lib) dans le flow de synthèse ?
 
@@ -51,7 +51,7 @@
 
 **D)** Il stocke le netlist synthétisé du design
 
----
+---B---
 
 ## Question 5 : La variable `$dojo_root` est calculée avec `file dirname` appelé 3 fois. Pourquoi ?
 
@@ -63,7 +63,7 @@
 
 **D)** Pour normaliser les séparateurs de chemin
 
----
+---A---
 
 ## Votre score
 
@@ -71,11 +71,11 @@ Notez vos réponses ici avant de vérifier :
 
 | Question | Votre réponse |
 |----------|---------------|
-| Q1       |               |
-| Q2       |               |
-| Q3       |               |
-| Q4       |               |
-| Q5       |               |
+| Q1       |      B        |
+| Q2       |      C        |
+| Q3       |      C        |
+| Q4       |      A        |
+| Q5       |      A        |
 
 ---
 

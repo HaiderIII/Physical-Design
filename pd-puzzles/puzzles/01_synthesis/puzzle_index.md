@@ -4,4 +4,10 @@
 
 | ID | Nom | Niveau | PDK | Status |
 |----|-----|--------|-----|--------|
-| - | À venir | - | - | ⬜ |
+| syn_001 | The Missing Library | 🟢 Débutant | Nangate45 | ✅ |
+
+## Compétences couvertes
+
+- Gestion des chemins de fichiers en TCL
+- Structure des fichiers PDK (Liberty, LEF)
+- Debug des erreurs de chargement de bibliothèque
