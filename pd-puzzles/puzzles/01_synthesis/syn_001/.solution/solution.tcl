@@ -44,12 +44,12 @@ set lib_file "$pdk_root/lib/NangateOpenCellLibrary_typical.lib"
 
 # LEF files (physical library) - in lef/ subdirectory
 set tech_lef "$pdk_root/lef/NangateOpenCellLibrary.tech.lef"
-set cell_lef "$pdk_root/lef/NangateOpenCellLibrary.lef"
+set cell_lef "$pdk_root/lef/NangateOpenCellLibrary.macro.mod.lef"
 
 # Alternative using file join (more portable):
 # set lib_file [file join $pdk_root "lib" "NangateOpenCellLibrary_typical.lib"]
 # set tech_lef [file join $pdk_root "lef" "NangateOpenCellLibrary.tech.lef"]
-# set cell_lef [file join $pdk_root "lef" "NangateOpenCellLibrary.lef"]
+# set cell_lef [file join $pdk_root "lef" "NangateOpenCellLibrary.macro.mod.lef"]
 
 #-------------------------------------------------------------------------------
 # Step 3: Read PDK files

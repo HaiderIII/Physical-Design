@@ -42,11 +42,11 @@ file mkdir $results_dir
 set pdk_dir "liberty"  ;# <-- THIS IS WRONG! Fix this line
 
 # Liberty file (timing library)
-set lib_file "$pdk_dir/NangateOpenCellLibrary_typical.lib"
+set lib_file "$pdk_dir/lib/NangateOpenCellLibrary_typical.lib"
 
 # LEF files (physical library)
-set tech_lef "$pdk_dir/NangateOpenCellLibrary.tech.lef"
-set cell_lef "$pdk_dir/NangateOpenCellLibrary.lef"
+set tech_lef "$pdk_dir/lef/NangateOpenCellLibrary.tech.lef"
+set cell_lef "$pdk_dir/lef/NangateOpenCellLibrary.macro.mod.lef"
 
 #-------------------------------------------------------------------------------
 # Step 3: Read PDK files

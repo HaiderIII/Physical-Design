@@ -1,5 +1,5 @@
 #===============================================================================
-# PD-Dojo Installation Verification Script
+# PD-Puzzles Installation Verification Script
 #===============================================================================
 # Run with: openroad verify_install.tcl
 #
@@ -9,7 +9,7 @@
 
 puts ""
 puts "╔════════════════════════════════════════════════════════════════╗"
-puts "║  🥋 PD-Dojo Installation Verification                         ║"
+puts "║  🥋 PD-Puzzles Installation Verification                      ║"
 puts "╚════════════════════════════════════════════════════════════════╝"
 puts ""
 
@@ -21,7 +21,7 @@ set script_dir [file dirname [file normalize [info script]]]
 set dojo_root [file dirname $script_dir]
 set pdk_dir [file join $dojo_root "common" "pdks"]
 
-puts "PD-Dojo root: $dojo_root"
+puts "PD-Puzzles root: $dojo_root"
 puts "PDK directory: $pdk_dir"
 puts ""
 
@@ -80,21 +80,20 @@ set ng45_ok 1
 if {[file isdirectory $ng45_dir]} {
     puts "  ✓ Directory exists: $ng45_dir"
 
-    # Check key files
+    # Check key files (note: ORFS uses .macro.lef instead of .lef)
     set ng45_lib [file join $ng45_dir "lib" "NangateOpenCellLibrary_typical.lib"]
-    set ng45_lef [file join $ng45_dir "lef" "NangateOpenCellLibrary.lef"]
+    set ng45_lef [file join $ng45_dir "lef" "NangateOpenCellLibrary.macro.mod.lef"]
     set ng45_tlef [file join $ng45_dir "lef" "NangateOpenCellLibrary.tech.lef"]
 
     if {![check_file_exists $ng45_lib "Liberty file (typical)"]} {set ng45_ok 0}
-    if {![check_file_exists $ng45_lef "Library LEF"]} {set ng45_ok 0}
+    if {![check_file_exists $ng45_lef "Library LEF (macro.mod)"]} {set ng45_ok 0}
+    if {![check_file_exists $ng45_tlef "Tech LEF"]} {set ng45_ok 0}
 
     # Try to load files
     if {$ng45_ok} {
         # Clear any previous design state
         if {[catch {
-            if {[file exists $ng45_tlef]} {
-                read_lef $ng45_tlef
-            }
+            read_lef $ng45_tlef
             read_lef $ng45_lef
             read_liberty $ng45_lib
         } err]} {

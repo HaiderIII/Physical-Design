@@ -143,15 +143,15 @@ clone_orfs_if_needed() {
     local orfs_cache="$CACHE_DIR/OpenROAD-flow-scripts"
 
     if [ -d "$orfs_cache/.git" ]; then
-        print_info "Using cached OpenROAD-flow-scripts"
-        print_step "Updating cache..."
-        (cd "$orfs_cache" && git fetch origin && git checkout $ORFS_BRANCH && git pull origin $ORFS_BRANCH) || {
-            print_warning "Update failed, using existing cache"
+        print_info "Using cached OpenROAD-flow-scripts" >&2
+        print_step "Updating cache..." >&2
+        (cd "$orfs_cache" && git fetch origin && git checkout $ORFS_BRANCH && git pull origin $ORFS_BRANCH) >&2 || {
+            print_warning "Update failed, using existing cache" >&2
         }
     else
-        print_step "Cloning OpenROAD-flow-scripts (this may take a while)..."
+        print_step "Cloning OpenROAD-flow-scripts (this may take a while)..." >&2
         rm -rf "$orfs_cache"
-        git clone --depth 1 --branch $ORFS_BRANCH "$ORFS_REPO" "$orfs_cache"
+        git clone --depth 1 --branch $ORFS_BRANCH "$ORFS_REPO" "$orfs_cache" >&2
     fi
 
     echo "$orfs_cache"
