@@ -1,112 +1,177 @@
-# 🥋 PD-Puzzles
+# PD-Puzzles
 
 **Physical Design Puzzle Challenges with OpenROAD**
 
-Un système de casse-têtes progressifs pour maîtriser le flow Physical Design et développer les compétences d'un ingénieur PD.
+Learn by debugging real-world Physical Design problems. Each puzzle presents a broken or misconfigured design that you must fix.
 
 ---
 
-## 🎯 Objectif
+## Concept
 
-Apprendre à résoudre les problèmes **réels** rencontrés par les ingénieurs Physical Design :
-- Debugging de scripts TCL
-- Analyse et correction de violations
-- Optimisation des résultats (timing, area, power)
-- Interprétation des logs et rapports
+Puzzles simulate **real problems** that PD engineers face daily:
+- Debugging TCL scripts
+- Fixing timing violations
+- Analyzing and correcting tool errors
+- Optimizing design results
 
-> **Philosophie** : Focus sur les compétences où l'ingénieur apporte une vraie valeur ajoutée, pas sur ce que l'IA peut faire automatiquement.
-
----
-
-## 🛠️ Technologies
-
-| PDK | Node | Usage |
-|-----|------|-------|
-| **Nangate45** | 45nm | Puzzles débutants, flow rapide |
-| **Sky130** | 130nm | Puzzles intermédiaires, PDK industriel |
-| **ASAP7** | 7nm | Puzzles avancés, effets FinFET |
+> **Philosophy**: Focus on skills where human expertise matters - debugging, analysis, and decision-making.
 
 ---
 
-## 📊 Niveaux de difficulté
+## Getting Started
 
-| Niveau | Description | Temps estimé |
-|--------|-------------|--------------|
-| 🟢 Débutant | Concepts fondamentaux, erreurs simples | 15-20 min |
-| 🟡 Intermédiaire | Problèmes courants, analyse requise | 30-45 min |
-| 🔴 Avancé | Cas complexes, multi-facteurs | 45-60 min |
+### 1. Verify PDK Installation
+
+```bash
+cd setup
+openroad verify_install.tcl
+```
+
+### 2. Learn TCL Basics (Recommended)
+
+```bash
+cd tcl_fundamentals
+# Follow: 01_basics.md → 02_control_flow.md → 03_openroad_api.md
+```
+
+### 3. Start Your First Puzzle
+
+```bash
+cd puzzles/01_synthesis/syn_001
+cat PROBLEM.md              # Read the problem
+openroad run.tcl            # Try to run (it will fail)
+# Debug and fix the issue
+cat QUIZ.md                 # Validate your understanding
+```
 
 ---
 
-## 📁 Structure
+## Available Puzzles
+
+### 01_synthesis/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| syn_001 | The Missing Library | Beginner | Library path configuration |
+
+### 02_floorplan/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| flp_001 | The Impossible Floorplan | Beginner | Die area calculation |
+
+### 03_placement/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| plc_001_density | The Density Dilemma | Intermediate | Placement density |
+
+### 04_cts/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| cts_001_skew | The Buffer Blunder | Intermediate | Clock skew optimization |
+
+### 05_routing/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| rte_001_layers | The Layer Labyrinth | Intermediate | Routing layer config |
+
+### 06_signoff/
+
+| Puzzle | Name | Difficulty | Focus |
+|--------|------|------------|-------|
+| sgn_001_timing | The Timing Terror | Advanced | Static timing analysis |
+
+---
+
+## Puzzle Structure
+
+Each puzzle folder contains:
+
+```
+puzzle_name/
+├── PROBLEM.md      # Context, symptoms, objective
+├── run.tcl         # Script with TODO items to fix
+├── resources/      # Design files (Verilog, SDC, etc.)
+├── hints.md        # Progressive hints (if stuck)
+├── QUIZ.md         # Validation questions
+└── .solution/      # Solution (revealed after quiz)
+```
+
+### Difficulty Levels
+
+| Level | Time | Description |
+|-------|------|-------------|
+| Beginner | 15-20 min | Fundamental concepts, simple errors |
+| Intermediate | 30-45 min | Common problems, analysis required |
+| Advanced | 45-60 min | Complex multi-factor issues |
+
+---
+
+## Directory Structure
 
 ```
 pd-puzzles/
-├── setup/                  # Installation des PDKs
-├── tcl_fundamentals/       # Cours TCL avant les puzzles
-├── puzzles/
-│   ├── 01_synthesis/       # Puzzles synthèse
-│   ├── 02_floorplan/       # Puzzles floorplanning
-│   ├── 03_placement/       # Puzzles placement
-│   ├── 04_cts/             # Puzzles Clock Tree Synthesis
-│   ├── 05_routing/         # Puzzles routing
-│   └── 06_signoff/         # Puzzles signoff
-└── common/                 # Ressources partagées
+├── setup/                  # PDK verification
+│   └── verify_install.tcl
+│
+├── tcl_fundamentals/       # TCL crash course
+│   ├── 01_basics.md
+│   ├── 02_control_flow.md
+│   ├── 03_openroad_api.md
+│   └── exercises/
+│
+├── puzzles/                # All puzzle categories
+│   ├── 01_synthesis/
+│   ├── 02_floorplan/
+│   ├── 03_placement/
+│   ├── 04_cts/
+│   ├── 05_routing/
+│   └── 06_signoff/
+│
+└── common/                 # Shared resources
+    └── pdks/nangate45/     # 45nm PDK
 ```
 
 ---
 
-## 🚀 Pour commencer
+## PDK: Nangate45
 
-### 1. Installation des PDKs
-```bash
-cd setup
-./install_pdks.sh
-openroad -gui verify_install.tcl
-```
+All puzzles use the **Nangate45** open-source PDK (45nm):
 
-### 2. Apprendre les bases TCL
-```bash
-cd tcl_fundamentals
-# Suivre 01_basics.md → 02_control_flow.md → 03_openroad_api.md
-```
+| Component | File |
+|-----------|------|
+| Liberty | NangateOpenCellLibrary_typical.lib |
+| Tech LEF | NangateOpenCellLibrary.tech.lef |
+| Cell LEF | NangateOpenCellLibrary.lef |
 
-### 3. Premier puzzle
-```bash
-cd puzzles/01_synthesis/syn_001
-cat PROBLEM.md              # Lire l'énoncé
-openroad -gui run.tcl       # Tenter de résoudre
-cat QUIZ.md                 # Valider la compréhension
-```
+Location: `common/pdks/nangate45/`
 
 ---
 
-## 📋 Format d'un puzzle
+## Progress Tracking
 
-Chaque puzzle contient :
-
-| Fichier | Description |
-|---------|-------------|
-| `PROBLEM.md` | Contexte, symptômes, objectif |
-| `resources/` | Fichiers fournis (design, libs, etc.) |
-| `run.tcl` | Script avec TODO à compléter |
-| `hints.md` | Indices progressifs (optionnel) |
-| `QUIZ.md` | QCM de validation |
-| `.solution/` | Solution révélée après le quiz |
+Track your progress in [PROGRESS.md](PROGRESS.md)
 
 ---
 
-## 📈 Progression
+## Skills Developed
 
-Suivre sa progression dans [PROGRESS.md](PROGRESS.md)
+- TCL scripting for EDA tools
+- Log analysis and interpretation
+- Methodical debugging
+- Understanding PD trade-offs
+- OpenROAD API usage
+- Fixing violations (timing, DRC, antenna)
 
 ---
 
-## 🎓 Compétences développées
+## Tips for Success
 
-- ✅ Scripting TCL pour EDA
-- ✅ Lecture et analyse de logs
-- ✅ Debug méthodique
-- ✅ Compréhension des trade-offs PD
-- ✅ Utilisation de l'API OpenROAD
-- ✅ Résolution de violations (timing, DRC, antenna)
+1. **Read the error messages carefully** - They often point to the exact problem
+2. **Use hints progressively** - Don't jump to solutions
+3. **Complete the quiz** - It validates deep understanding
+4. **Experiment** - Try different values to see their effects
+5. **Take notes** - Document what you learn for future reference
