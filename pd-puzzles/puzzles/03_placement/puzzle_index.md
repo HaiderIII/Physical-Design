@@ -15,6 +15,7 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
 | plc_001_density | [The Density Dilemma](plc_001_density/PROBLEM.md) | Beginner | Nangate45 | Completed |
+| plc_002_timing_driven | [The Timing Tunnel Vision](plc_002_timing_driven/PROBLEM.md) | Intermediate | Sky130HD | Completed |
 
 ---
 
@@ -23,6 +24,10 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 1. **plc_001_density** - Placement density basics (15-20 min)
    - *Bug*: Density too high (0.95)
    - *Skills*: Density parameter, placement quality metrics
+
+2. **plc_002_timing_driven** - Timing-driven placement (20-25 min)
+   - *Bug*: Missing `-timing_driven` flag
+   - *Skills*: Timing optimization, SDC constraints in placement
 
 ---
 
@@ -51,6 +56,16 @@ density = 0.60 → Balanced (40% whitespace)
 density = 0.40 → Relaxed (60% whitespace)
 ```
 
+### Timing-Driven Placement
+
+```
+Without timing-driven:
+  All nets weighted equally → Critical paths may get long wires
+
+With timing-driven (-timing_driven flag):
+  Critical nets prioritized → Timing-critical paths stay short
+```
+
 ### Quality Metrics
 
 | Metric | Description |
@@ -58,9 +73,10 @@ density = 0.40 → Relaxed (60% whitespace)
 | HPWL | Half-Perimeter Wire Length |
 | delta HPWL | Change during legalization |
 | displacement | How far cells moved |
+| slack | Timing margin (positive = good) |
 
 ### Common Placement Errors
 
 - High delta HPWL: Density too high
 - Routing congestion: Not enough space
-- Timing failures: Poor cell positions
+- Timing failures: Missing `-timing_driven` flag

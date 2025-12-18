@@ -1,0 +1,88 @@
+library(analog_macro_lib) {
+  comment                        : "";
+  delay_model                    : table_lookup;
+  simulation                     : false;
+  capacitive_load_unit (1,pF);
+  leakage_power_unit             : 1pW;
+  current_unit                   : "1A";
+  pulling_resistance_unit        : "1kohm";
+  time_unit                      : "1ns";
+  voltage_unit                   : "1v";
+  library_features(report_delay_calculation);
+
+  input_threshold_pct_rise : 50;
+  input_threshold_pct_fall : 50;
+  output_threshold_pct_rise : 50;
+  output_threshold_pct_fall : 50;
+  slew_lower_threshold_pct_rise : 20;
+  slew_lower_threshold_pct_fall : 20;
+  slew_upper_threshold_pct_rise : 80;
+  slew_upper_threshold_pct_fall : 80;
+  slew_derate_from_library : 1.0;
+
+
+  nom_process                    : 1.0;
+  nom_temperature                : 25.0;
+  nom_voltage                    : 1.80;
+
+  type ("data_in") {
+    base_type : array;
+    data_type : bit;
+    bit_width : 4;
+    bit_from : 3;
+    bit_to : 0;
+  }
+
+  cell(analog_macro) {
+    area : 1200;
+    dont_touch : true;
+    dont_use : true;
+
+    pin(clk) {
+      direction : input;
+      capacitance : 0.05;
+      clock : true;
+    }
+
+    pin(enable) {
+      direction : input;
+      capacitance : 0.02;
+    }
+
+    bus(data_in) {
+      bus_type : data_in;
+      direction : input;
+      capacitance : 0.02;
+
+      pin(data_in[3]) { direction : input; capacitance : 0.02; }
+      pin(data_in[2]) { direction : input; capacitance : 0.02; }
+      pin(data_in[1]) { direction : input; capacitance : 0.02; }
+      pin(data_in[0]) { direction : input; capacitance : 0.02; }
+    }
+
+    pin(analog_out) {
+      direction : output;
+      capacitance : 0.0;
+      max_capacitance : 0.5;
+
+      timing() {
+        related_pin : "clk";
+        timing_type : rising_edge;
+        cell_rise(scalar) { values("1.0"); }
+        cell_fall(scalar) { values("1.0"); }
+        rise_transition(scalar) { values("0.1"); }
+        fall_transition(scalar) { values("0.1"); }
+      }
+    }
+
+    pin(VDD) {
+      direction : inout;
+      always_on : true;
+    }
+
+    pin(VSS) {
+      direction : inout;
+      always_on : true;
+    }
+  }
+}

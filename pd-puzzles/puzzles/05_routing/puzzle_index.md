@@ -1,41 +1,60 @@
 # 05_routing Puzzles - Global & Detailed Routing
 
-## 📋 Liste des puzzles
+## Puzzle List
 
-| ID | Nom | Niveau | PDK | Status |
-|----|-----|--------|-----|--------|
-| rte_001_layers | The Layer Labyrinth | ⭐ Débutant | Nangate45 | ✅ Complété |
-
----
-
-## 🎯 Concepts couverts
-
-### rte_001_layers - The Layer Labyrinth
-- **Bug**: Utiliser metal1-metal2 au lieu de metal2-metal6 pour le routage
-- **Concept**: Configuration des couches de routage
-- **Apprentissage**:
-  - Pourquoi éviter metal1 pour le routage signal
-  - Nombre de couches nécessaires
-  - Global routing vs detailed routing
-  - Layer adjustments
+| ID | Name | Level | PDK | Status |
+|----|------|-------|-----|--------|
+| rte_001_layers | [The Layer Labyrinth](rte_001_layers/PROBLEM.md) | Beginner | Nangate45 | Completed |
+| rte_002_adjustment_agony | [The Adjustment Agony](rte_002_adjustment_agony/PROBLEM.md) | Intermediate | Sky130HD | Completed |
 
 ---
 
-## 🚀 Puzzles à venir
+## Progression Path
 
-| ID | Concept | Niveau |
-|----|---------|--------|
-| rte_002_congestion | Analyse de congestion | ⭐⭐ |
-| rte_003_drc | Résolution de violations DRC | ⭐⭐ |
-| rte_004_timing | Routage timing-driven | ⭐⭐⭐ |
+1. **rte_001_layers** - Routing layer configuration (15-20 min)
+   - *Bug*: Using metal1-metal2 instead of metal2-metal6 for routing
+   - *Skills*: Routing layer selection, congestion basics
+
+2. **rte_002_adjustment_agony** - Layer adjustment values (20-25 min)
+   - *Bug*: Inverted layer adjustments (blocking upper layers, freeing lower)
+   - *Skills*: Layer adjustment strategy, congestion management, resource allocation
 
 ---
 
-## 📝 Prérequis
+## Key Concepts
 
-Avant de commencer les puzzles routing, assurez-vous d'avoir complété:
-1. ✅ `flp_001_sizing` - Comprendre le floorplanning
-2. ✅ `plc_001_density` - Comprendre le placement
-3. ✅ `cts_001_skew` - Comprendre le CTS
+### Layer Adjustment Values
 
-Le routing est l'étape finale avant la vérification physique.
+| Value | Meaning | Effect |
+|-------|---------|--------|
+| 0.0 | No reduction | Full capacity available |
+| 0.5 | 50% reduction | Half capacity |
+| 1.0 | 100% reduction | Layer blocked |
+
+### Typical Adjustment Strategy
+
+| Layer | Typical Adjustment | Reason |
+|-------|-------------------|--------|
+| met1 | 0.8-1.0 | Very congested (cell pins) |
+| met2 | 0.5-0.7 | Moderate congestion |
+| met3 | 0.3-0.5 | Less congested |
+| met4 | 0.1-0.3 | Usually available |
+| met5 | 0.0-0.2 | Most available |
+
+### Common Routing Errors
+
+- Using wrong layer range for signals
+- Inverted layer adjustments
+- Not accounting for cell pin congestion on lower layers
+- Over-restricting available routing layers
+
+---
+
+## Prerequisites
+
+Before starting routing puzzles, complete:
+1. `flp_001_sizing` - Understanding floorplanning
+2. `plc_001_density` - Understanding placement
+3. `cts_001_skew` - Understanding CTS
+
+Routing is the final step before physical verification.

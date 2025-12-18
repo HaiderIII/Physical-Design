@@ -1,31 +1,31 @@
 # 02_floorplan Puzzles
 
-## Overview
-
-Floorplan is the foundation of physical design. These puzzles cover:
-- Die and core area sizing
-- Utilization calculations
-- IO placement
-- Macro placement
-- Power planning basics
-
----
-
 ## Puzzle List
 
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
-| flp_001 | [The Impossible Floorplan](flp_001/PROBLEM.md) | Beginner | Nangate45 | Completed |
+| flp_001 | The Impossible Floorplan | Beginner | Nangate45 | ✅ |
+| flp_002 | The Halo Headache | Intermediate | Sky130 | ✅ |
 
----
+## Skills Covered
 
-## Progression Path
+- Die and core area sizing
+- Utilization calculations
+- IO placement
+- **Macro placement with blockages**
+- **Halo/keepout region definition**
+- **Analog-digital isolation**
 
-1. **flp_001** - Die area sizing and utilization (15-20 min)
-   - *Bug*: Die too small for the design
-   - *Skills*: Area calculation, utilization concepts
+## Progression
 
----
+```
+flp_001 (Nangate45) ──► flp_002 (Sky130)
+    │                       │
+    │                       │
+    ▼                       ▼
+ Die area sizing       Macro blockages
+ Utilization math      Halo placement
+```
 
 ## Key Concepts
 
@@ -44,7 +44,10 @@ Typical ranges:
 - High-performance: 30-50%
 ```
 
-### Common Floorplan Errors
-- Utilization > 100%: Die too small
-- Placement congestion: Not enough routing space
-- Timing failures: Poor macro placement
+### Placement Blockages (flp_002)
+```tcl
+# Create keepout region around macros
+create_blockage -region {x1 y1 x2 y2}
+
+# Calculation: macro_position - halo to macro_position + size + halo
+```

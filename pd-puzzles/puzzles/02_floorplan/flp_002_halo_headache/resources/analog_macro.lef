@@ -1,0 +1,102 @@
+VERSION 5.8 ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+MACRO analog_macro
+  CLASS BLOCK ;
+  FOREIGN analog_macro ;
+  ORIGIN 0 0 ;
+  SIZE 40 BY 30 ;
+  SYMMETRY X Y ;
+
+  PIN clk
+    DIRECTION INPUT ;
+    USE CLOCK ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 14.5 0.5 15.5 ;
+    END
+  END clk
+
+  PIN enable
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 10.0 0.5 11.0 ;
+    END
+  END enable
+
+  PIN data_in[0]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 20.0 0.5 21.0 ;
+    END
+  END data_in[0]
+
+  PIN data_in[1]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 22.0 0.5 23.0 ;
+    END
+  END data_in[1]
+
+  PIN data_in[2]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 24.0 0.5 25.0 ;
+    END
+  END data_in[2]
+
+  PIN data_in[3]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.0 26.0 0.5 27.0 ;
+    END
+  END data_in[3]
+
+  PIN analog_out
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 39.5 15.0 40.0 16.0 ;
+    END
+  END analog_out
+
+  PIN VDD
+    DIRECTION INOUT ;
+    USE POWER ;
+    PORT
+      LAYER met1 ;
+        RECT 0.0 29.0 40.0 30.0 ;
+    END
+  END VDD
+
+  PIN VSS
+    DIRECTION INOUT ;
+    USE GROUND ;
+    PORT
+      LAYER met1 ;
+        RECT 0.0 0.0 40.0 1.0 ;
+    END
+  END VSS
+
+  OBS
+    LAYER met1 ;
+      RECT 1.0 1.0 39.0 29.0 ;
+    LAYER met2 ;
+      RECT 1.0 1.0 39.0 29.0 ;
+  END
+
+END analog_macro
+
+END LIBRARY
