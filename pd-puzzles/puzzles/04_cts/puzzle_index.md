@@ -6,6 +6,7 @@
 |----|------|-------|-----|--------|
 | cts_001_skew | [The Buffer Blunder](cts_001_skew/PROBLEM.md) | Beginner | Nangate45 | Completed |
 | cts_002_buffer_bonanza | [The Buffer Bonanza](cts_002_buffer_bonanza/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| cts_003_sink_shuffle | [Sink Shuffle](cts_003_sink_shuffle/PROBLEM.md) | Advanced | ASAP7 | ✅ |
 
 ---
 
@@ -18,6 +19,10 @@
 2. **cts_002_buffer_bonanza** - Sky130 clock buffers (20-25 min)
    - *Bug*: Using inverters (inv_*) instead of clock buffers (clkbuf_*)
    - *Skills*: Sky130 clock buffer cells, duty cycle, CTS configuration
+
+3. **cts_003_sink_shuffle** - Sink clustering for 7nm (15-20 min)
+   - *Bug*: Sink clustering disabled, diameter too large
+   - *Skills*: Sink clustering, cluster diameter, skew control
 
 ---
 
@@ -50,8 +55,26 @@ clock_tree_synthesis -root_buf <strong_clkbuf> \
                      -sink_clustering_enable
 ```
 
+### Sink Clustering (Advanced Nodes)
+
+```tcl
+clock_tree_synthesis -root_buf $root \
+                     -buf_list $buffers \
+                     -sink_clustering_enable \
+                     -sink_clustering_max_diameter 30
+```
+
+| Diameter | Effect |
+|----------|--------|
+| 200+ um  | Too large - high skew |
+| 50-100 um | Moderate |
+| 20-50 um | Good for 7nm |
+| <10 um | Too small - many buffers |
+
 ### Common CTS Errors
 
 - Using wrong buffer types (inv_*, buf_* instead of clkbuf_*)
 - Root buffer too weak for fanout
 - Missing buffer sizes in buf_list
+- Sink clustering disabled at advanced nodes
+- Cluster diameter too large for technology

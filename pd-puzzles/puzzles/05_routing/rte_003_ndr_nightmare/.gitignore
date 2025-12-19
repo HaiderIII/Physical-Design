@@ -1,0 +1,4 @@
+# Ignore solution files in git status
+.solution/
+results/
+*.log

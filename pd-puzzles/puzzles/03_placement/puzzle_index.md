@@ -16,6 +16,7 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 |----|------|-------|-----|--------|
 | plc_001_density | [The Density Dilemma](plc_001_density/PROBLEM.md) | Beginner | Nangate45 | Completed |
 | plc_002_timing_driven | [The Timing Tunnel Vision](plc_002_timing_driven/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| plc_003_padding_panic | [Padding Panic](plc_003_padding_panic/PROBLEM.md) | Advanced | ASAP7 | ✅ |
 
 ---
 
@@ -28,6 +29,10 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 2. **plc_002_timing_driven** - Timing-driven placement (20-25 min)
    - *Bug*: Missing `-timing_driven` flag
    - *Skills*: Timing optimization, SDC constraints in placement
+
+3. **plc_003_padding_panic** - Cell padding for advanced nodes (15-20 min)
+   - *Bug*: No cell padding configured
+   - *Skills*: Cell padding, routing congestion, DFF spacing
 
 ---
 
@@ -75,8 +80,24 @@ With timing-driven (-timing_driven flag):
 | displacement | How far cells moved |
 | slack | Timing margin (positive = good) |
 
+### Cell Padding (Advanced Nodes)
+
+```tcl
+# Add spacing between cells for routing
+set_placement_padding -global -left 2 -right 2
+
+# Extra padding for sequential cells
+set_placement_padding -masters {DFF*} -left 4 -right 4
+```
+
+Why padding matters at 7nm:
+- Tight metal pitches (36nm M1/M2)
+- Need room for local routing
+- Clock tree routing near flip-flops
+
 ### Common Placement Errors
 
 - High delta HPWL: Density too high
 - Routing congestion: Not enough space
 - Timing failures: Missing `-timing_driven` flag
+- DRC violations: Missing cell padding (advanced nodes)

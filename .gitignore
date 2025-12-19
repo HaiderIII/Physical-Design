@@ -1,0 +1,28 @@
+# AI Assistants
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+
+# Logs & Temp files
+*_run.log
+*.log
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+*.o
+*.a
+*.so
+
+# Results that shouldn't be committed
+results/

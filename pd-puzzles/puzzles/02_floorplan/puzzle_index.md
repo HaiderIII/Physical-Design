@@ -6,6 +6,7 @@
 |----|------|-------|-----|--------|
 | flp_001 | The Impossible Floorplan | Beginner | Nangate45 | ✅ |
 | flp_002 | The Halo Headache | Intermediate | Sky130 | ✅ |
+| flp_003 | Density Disaster | Advanced | ASAP7 | ✅ |
 
 ## Skills Covered
 
@@ -15,16 +16,18 @@
 - **Macro placement with blockages**
 - **Halo/keepout region definition**
 - **Analog-digital isolation**
+- **Density targets for advanced nodes**
+- **IO perimeter requirements**
 
 ## Progression
 
 ```
-flp_001 (Nangate45) ──► flp_002 (Sky130)
-    │                       │
-    │                       │
-    ▼                       ▼
- Die area sizing       Macro blockages
- Utilization math      Halo placement
+flp_001 (Nangate45) ──► flp_002 (Sky130) ──► flp_003 (ASAP7)
+    │                       │                    │
+    │                       │                    │
+    ▼                       ▼                    ▼
+ Die area sizing       Macro blockages      Density targets
+ Utilization math      Halo placement       IO perimeter
 ```
 
 ## Key Concepts

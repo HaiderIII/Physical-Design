@@ -6,6 +6,7 @@
 |----|------|-------|-----|--------|
 | rte_001_layers | [The Layer Labyrinth](rte_001_layers/PROBLEM.md) | Beginner | Nangate45 | Completed |
 | rte_002_adjustment_agony | [The Adjustment Agony](rte_002_adjustment_agony/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| rte_003_ndr_nightmare | [NDR Nightmare](rte_003_ndr_nightmare/PROBLEM.md) | Advanced | ASAP7 | ✅ |
 
 ---
 
@@ -18,6 +19,10 @@
 2. **rte_002_adjustment_agony** - Layer adjustment values (20-25 min)
    - *Bug*: Inverted layer adjustments (blocking upper layers, freeing lower)
    - *Skills*: Layer adjustment strategy, congestion management, resource allocation
+
+3. **rte_003_ndr_nightmare** - Min routing layer for 7nm (15-20 min)
+   - *Bug*: Min routing layer set to M2 (too low for ASAP7)
+   - *Skills*: Metal stack understanding, layer selection for advanced nodes
 
 ---
 
@@ -41,12 +46,24 @@
 | met4 | 0.1-0.3 | Usually available |
 | met5 | 0.0-0.2 | Most available |
 
+### ASAP7 Metal Stack (7nm)
+
+| Layer | Pitch | Primary Use |
+|-------|-------|-------------|
+| M1 | 36nm | Cell internal (blocked) |
+| M2 | 36nm | Cell pins (congested) |
+| M3 | 48nm | Local routing (limited) |
+| M4 | 48nm | Signal routing (start here!) |
+| M5-M6 | 48nm | Global routing |
+| M7 | 80nm | Power/clock |
+
 ### Common Routing Errors
 
 - Using wrong layer range for signals
 - Inverted layer adjustments
 - Not accounting for cell pin congestion on lower layers
 - Over-restricting available routing layers
+- Min layer too low for advanced nodes
 
 ---
 

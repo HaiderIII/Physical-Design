@@ -6,6 +6,7 @@
 |----|------|-------|-----|--------|
 | sgn_001_timing | [The Timing Terror](sgn_001_timing/PROBLEM.md) | Beginner | Nangate45 | Completed |
 | sgn_002_constraint_crisis | [The Constraint Crisis](sgn_002_constraint_crisis/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| sgn_003_corner_catastrophe | [Corner Catastrophe](sgn_003_corner_catastrophe/PROBLEM.md) | Advanced | ASAP7 | ✅ |
 
 ---
 
@@ -18,6 +19,10 @@
 2. **sgn_002_constraint_crisis** - I/O timing constraints (20-25 min)
    - *Bug*: Missing `set_input_delay` and `set_output_delay` in SDC
    - *Skills*: I/O constraints, complete SDC for signoff
+
+3. **sgn_003_corner_catastrophe** - Multi-corner analysis (20-25 min)
+   - *Bug*: Only TT corner loaded, missing SS/FF for proper signoff
+   - *Skills*: Multi-corner timing, PVT variation, signoff methodology
 
 ---
 
@@ -38,11 +43,21 @@
 4. **Driving cells**: `set_driving_cell` for input characteristics
 5. **Output loads**: `set_load` for output fanout
 
+### PVT Corners (Advanced Nodes)
+
+| Corner | Meaning | Used For |
+|--------|---------|----------|
+| SS | Slow-Slow | Setup analysis (worst-case slow) |
+| FF | Fast-Fast | Hold analysis (worst-case fast) |
+| TT | Typical-Typical | Nominal behavior |
+| SF/FS | Mixed corners | Special cases |
+
 ### Common Issues
 
 - "No paths found" = Missing I/O constraints
 - Unconstrained I/O = Timing problems hidden from STA
 - Missing constraints = False confidence in timing
+- TT-only analysis = Hidden violations at process corners
 
 ---
 
