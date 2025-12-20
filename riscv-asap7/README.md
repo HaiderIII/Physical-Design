@@ -50,7 +50,7 @@
 - [x] Analyze gate count
 - [x] Technology mapping to ASAP7 cells
 
-**Synthesis Results (2024-12-20):**
+**Synthesis Results (2025-12-20):**
 
 | Metric | Value |
 |--------|-------|
