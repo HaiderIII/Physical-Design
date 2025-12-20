@@ -4,12 +4,12 @@
 
 | Phase | Completed | Total | Progress |
 |-------|-----------|-------|----------|
-| 01_synthesis | 3 | 3 | ██████████ |
-| 02_floorplan | 3 | 3 | ██████████ |
-| 03_placement | 3 | 3 | ██████████ |
-| 04_cts | 3 | 3 | ██████████ |
-| 05_routing | 3 | 3 | ██████████ |
-| 06_signoff | 3 | 3 | ██████████ |
+| 01_synthesis | 4 | 4 | ██████████ |
+| 02_floorplan | 4 | 4 | ██████████ |
+| 03_placement | 4 | 4 | ██████████ |
+| 04_cts | 4 | 4 | ██████████ |
+| 05_routing | 4 | 4 | ██████████ |
+| 06_signoff | 4 | 4 | ██████████ |
 
 ---
 
@@ -39,6 +39,14 @@
 - [x] rte_003 - NDR Nightmare
 - [x] sgn_003 - Corner Catastrophe
 
+### Day 4 - Expert (Multi-PDK)
+- [x] syn_004 - Forbidden Cells
+- [x] flp_004 - Blockage Blunder
+- [x] plc_004 - Padding Overflow
+- [x] cts_004 - Skew Spiral
+- [x] rte_004 - Congestion Catastrophe
+- [x] sgn_004 - Slew Spiral
+
 ---
 
 ## Achievements
@@ -49,6 +57,7 @@
 | Day 1 Complete | Complete all Day 1 puzzles | [x] |
 | Day 2 Complete | Complete all Day 2 puzzles | [x] |
 | Day 3 Complete | Complete all Day 3 puzzles | [x] |
+| Day 4 Complete | Complete all Day 4 puzzles | [x] |
 | Synthesizer | Complete all synthesis puzzles | [x] |
 | Architect | Complete all floorplan puzzles | [x] |
 | Placer | Complete all placement puzzles | [x] |
@@ -83,6 +92,12 @@
 | Day 3 | cts_003 | ASAP7 | 7/7 | Sink clustering, cluster diameter |
 | Day 3 | rte_003 | ASAP7 | 7/7 | Min routing layer, metal stack |
 | Day 3 | sgn_003 | ASAP7 | 7/7 | Multi-corner analysis, PVT corners |
+| Day 4 | syn_004 | Sky130HD | 7/7 | Forbidden cells, dont_use verification |
+| Day 4 | flp_004 | Sky130HD | 6/7 | Placement blockage coordinates |
+| Day 4 | plc_004 | Sky130HD | 6/7 | Cell padding overflow, capacity calculation |
+| Day 4 | cts_004 | Sky130HD | 7/7 | Wire RC for CTS, parasitic estimation |
+| Day 4 | rte_004 | Sky130HD | 7/7 | Layer adjustment strategy, congestion |
+| Day 4 | sgn_004 | Sky130HD | 6/7 | Slew constraints, repair_design |
 
 ---
 
@@ -91,18 +106,5 @@
 | PDK | Node | Puzzles Completed |
 |-----|------|-------------------|
 | Nangate45 | 45nm | 6 |
-| Sky130HD | 130nm | 6 |
+| Sky130HD | 130nm | 12 |
 | ASAP7 | 7nm | 6 |
-
----
-
-## Congratulations!
-
-You have completed all 18 puzzles across 3 difficulty levels and 3 PDKs!
-
-**Final Statistics:**
-- Total Puzzles: 18/18
-- Day 3 Quiz Average: 6.5/7
-- All Achievements Unlocked!
-
-You are now a **PD Master**!

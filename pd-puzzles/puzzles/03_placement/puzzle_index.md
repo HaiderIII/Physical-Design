@@ -14,9 +14,10 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
-| plc_001_density | [The Density Dilemma](plc_001_density/PROBLEM.md) | Beginner | Nangate45 | Completed |
-| plc_002_timing_driven | [The Timing Tunnel Vision](plc_002_timing_driven/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| plc_001_density | [The Density Dilemma](plc_001_density/PROBLEM.md) | Beginner | Nangate45 | ✅ |
+| plc_002_timing_driven | [The Timing Tunnel Vision](plc_002_timing_driven/PROBLEM.md) | Intermediate | Sky130HD | ✅ |
 | plc_003_padding_panic | [Padding Panic](plc_003_padding_panic/PROBLEM.md) | Advanced | ASAP7 | ✅ |
+| plc_004_padding_overflow | [Padding Overflow](plc_004_padding_overflow/PROBLEM.md) | Expert | Sky130HD | ✅ |
 
 ---
 
@@ -33,6 +34,10 @@ Placement determines where cells are positioned on the chip. These puzzles cover
 3. **plc_003_padding_panic** - Cell padding for advanced nodes (15-20 min)
    - *Bug*: No cell padding configured
    - *Skills*: Cell padding, routing congestion, DFF spacing
+
+4. **plc_004_padding_overflow** - Excessive padding disaster (20-25 min)
+   - *Bug*: Padding of 10 sites is too aggressive for core area
+   - *Skills*: Padding calculation, capacity analysis, placement debugging
 
 ---
 

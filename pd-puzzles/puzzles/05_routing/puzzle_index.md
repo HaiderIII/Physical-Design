@@ -4,9 +4,10 @@
 
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
-| rte_001_layers | [The Layer Labyrinth](rte_001_layers/PROBLEM.md) | Beginner | Nangate45 | Completed |
-| rte_002_adjustment_agony | [The Adjustment Agony](rte_002_adjustment_agony/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| rte_001_layers | [The Layer Labyrinth](rte_001_layers/PROBLEM.md) | Beginner | Nangate45 | ✅ |
+| rte_002_adjustment_agony | [The Adjustment Agony](rte_002_adjustment_agony/PROBLEM.md) | Intermediate | Sky130HD | ✅ |
 | rte_003_ndr_nightmare | [NDR Nightmare](rte_003_ndr_nightmare/PROBLEM.md) | Advanced | ASAP7 | ✅ |
+| rte_004_congestion_catastrophe | [Congestion Catastrophe](rte_004_congestion_catastrophe/PROBLEM.md) | Expert | Sky130HD | ✅ |
 
 ---
 
@@ -23,6 +24,10 @@
 3. **rte_003_ndr_nightmare** - Min routing layer for 7nm (15-20 min)
    - *Bug*: Min routing layer set to M2 (too low for ASAP7)
    - *Skills*: Metal stack understanding, layer selection for advanced nodes
+
+4. **rte_004_congestion_catastrophe** - Layer capacity allocation (20-25 min)
+   - *Bug*: Upper layers (met4/met5) completely blocked (adjustment=1.0)
+   - *Skills*: Layer adjustment strategy, congestion analysis, crossbar routing
 
 ---
 

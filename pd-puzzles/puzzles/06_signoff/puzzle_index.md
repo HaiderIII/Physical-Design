@@ -4,9 +4,10 @@
 
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
-| sgn_001_timing | [The Timing Terror](sgn_001_timing/PROBLEM.md) | Beginner | Nangate45 | Completed |
-| sgn_002_constraint_crisis | [The Constraint Crisis](sgn_002_constraint_crisis/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| sgn_001_timing | [The Timing Terror](sgn_001_timing/PROBLEM.md) | Beginner | Nangate45 | ✅ |
+| sgn_002_constraint_crisis | [The Constraint Crisis](sgn_002_constraint_crisis/PROBLEM.md) | Intermediate | Sky130HD | ✅ |
 | sgn_003_corner_catastrophe | [Corner Catastrophe](sgn_003_corner_catastrophe/PROBLEM.md) | Advanced | ASAP7 | ✅ |
+| sgn_004_slew_spiral | [Slew Spiral](sgn_004_slew_spiral/PROBLEM.md) | Expert | Sky130HD | ✅ |
 
 ---
 
@@ -23,6 +24,10 @@
 3. **sgn_003_corner_catastrophe** - Multi-corner analysis (20-25 min)
    - *Bug*: Only TT corner loaded, missing SS/FF for proper signoff
    - *Skills*: Multi-corner timing, PVT variation, signoff methodology
+
+4. **sgn_004_slew_spiral** - Transition constraints (20-25 min)
+   - *Bug*: Missing `set_max_transition` constraints in SDC
+   - *Skills*: Slew/transition control, design rule constraints, timing closure
 
 ---
 

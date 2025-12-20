@@ -7,6 +7,7 @@
 | syn_001 | The Missing Library | Beginner | Nangate45 | ✅ |
 | syn_002 | The Corner Chaos | Intermediate | Sky130HD | ✅ |
 | syn_003 | The Voltage Vortex | Advanced | ASAP7 | ✅ |
+| syn_004 | Forbidden Cells | Expert | Sky130HD | ✅ |
 
 ## Skills Covered
 
@@ -19,13 +20,15 @@
 - **Multi-Vt concepts (RVT, LVT, SLVT)**
 - **Leakage vs speed trade-offs**
 - **Library-netlist matching**
+- **Forbidden cell detection (dont_use)**
+- **Netlist verification workflow**
 
 ## Progression
 
 ```
-syn_001 (Nangate45) ──► syn_002 (Sky130HD) ──► syn_003 (ASAP7)
-    │                       │                      │
-    ▼                       ▼                      ▼
- Path setup            Multi-corner            Multi-Vt
- PDK basics            PVT signoff          Power analysis
+syn_001 (Nangate45) ──► syn_002 (Sky130HD) ──► syn_003 (ASAP7) ──► syn_004 (Expert)
+    │                       │                      │                    │
+    ▼                       ▼                      ▼                    ▼
+ Path setup            Multi-corner            Multi-Vt          Forbidden cells
+ PDK basics            PVT signoff          Power analysis      Netlist QA
 ```

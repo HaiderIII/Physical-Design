@@ -4,9 +4,10 @@
 
 | ID | Name | Level | PDK | Status |
 |----|------|-------|-----|--------|
-| cts_001_skew | [The Buffer Blunder](cts_001_skew/PROBLEM.md) | Beginner | Nangate45 | Completed |
-| cts_002_buffer_bonanza | [The Buffer Bonanza](cts_002_buffer_bonanza/PROBLEM.md) | Intermediate | Sky130HD | Completed |
+| cts_001_skew | [The Buffer Blunder](cts_001_skew/PROBLEM.md) | Beginner | Nangate45 | ✅ |
+| cts_002_buffer_bonanza | [The Buffer Bonanza](cts_002_buffer_bonanza/PROBLEM.md) | Intermediate | Sky130HD | ✅ |
 | cts_003_sink_shuffle | [Sink Shuffle](cts_003_sink_shuffle/PROBLEM.md) | Advanced | ASAP7 | ✅ |
+| cts_004_skew_spiral | [Skew Spiral](cts_004_skew_spiral/PROBLEM.md) | Expert | Sky130HD | ✅ |
 
 ---
 
@@ -23,6 +24,10 @@
 3. **cts_003_sink_shuffle** - Sink clustering for 7nm (15-20 min)
    - *Bug*: Sink clustering disabled, diameter too large
    - *Skills*: Sink clustering, cluster diameter, skew control
+
+4. **cts_004_skew_spiral** - Wire RC for CTS (20-25 min)
+   - *Bug*: Missing set_wire_rc commands for signal and clock nets
+   - *Skills*: Wire RC estimation, parasitic modeling, layer selection
 
 ---
 
