@@ -1,0 +1,90 @@
+# ============================================================================
+# Phase 1: Synthesis Script (Yosys)
+# ============================================================================
+
+log "=========================================="
+log "   Phase 1: Synthesis"
+log "=========================================="
+
+#-------------------------------------------------------------------------------
+# Step 1: Load Liberty files
+#-------------------------------------------------------------------------------
+
+log "Loading ASAP7 Liberty files..."
+
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib.gz
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_INVBUF_RVT_TT_nldm_220122.lib.gz
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_AO_RVT_TT_nldm_211120.lib.gz
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_OA_RVT_TT_nldm_211120.lib.gz
+
+#-------------------------------------------------------------------------------
+# Step 2: Load RTL design
+#-------------------------------------------------------------------------------
+
+log "Loading RTL design..."
+
+read_verilog -sv src/riscv_pkg.v
+read_verilog -sv src/register_file.v
+read_verilog -sv src/alu.v
+read_verilog -sv src/decoder.v
+read_verilog -sv src/branch_unit.v
+read_verilog -sv src/hazard_unit.v
+read_verilog -sv src/memory_controller.v
+read_verilog -sv src/pipeline_registers.v
+read_verilog -sv src/sram_32x1024.v
+read_verilog -sv src/riscv_core.v
+read_verilog -sv src/riscv_soc.v
+
+#-------------------------------------------------------------------------------
+# Step 3: Elaborate design
+#-------------------------------------------------------------------------------
+
+log "Elaborating design..."
+
+hierarchy -check -top riscv_soc
+
+#-------------------------------------------------------------------------------
+# Step 4: Synthesis
+#-------------------------------------------------------------------------------
+
+log "Running synthesis..."
+
+synth -top riscv_soc
+
+#-------------------------------------------------------------------------------
+# Step 5: Technology mapping
+#-------------------------------------------------------------------------------
+
+log "Mapping to ASAP7 cells..."
+
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
+
+abc -script +strash;scorr;ifraig;retime,{D};strash;dch,-f;map,-M,1,{D} -liberty /home/faiz/projects/Physical-Design/riscv-asap7/lib/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib
+
+
+#-------------------------------------------------------------------------------
+# Step 6: Clean up
+#-------------------------------------------------------------------------------
+
+opt_clean -purge
+
+#-------------------------------------------------------------------------------
+# Step 7: Write netlist
+#-------------------------------------------------------------------------------
+
+log "Writing netlist..."
+
+write_verilog -noattr /home/faiz/projects/Physical-Design/riscv-asap7/results/riscv_soc/01_synthesis/riscv_soc_synth.v
+
+#-------------------------------------------------------------------------------
+# Step 8: Reports
+#-------------------------------------------------------------------------------
+
+log "Generating statistics..."
+
+stat
+
+log "=========================================="
+log "   Synthesis complete!"
+log "=========================================="
