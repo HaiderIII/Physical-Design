@@ -1,0 +1,24 @@
+# Yosys synthesis script for Burst Controller
+
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+read_verilog resources/burst_controller.v
+
+hierarchy -check -top burst_controller
+
+proc
+flatten
+opt
+
+techmap
+opt
+
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+abc -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+opt_clean -purge
+
+stat
+
+write_verilog -noattr results/burst_controller_synth.v

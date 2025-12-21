@@ -1,0 +1,21 @@
+# RTE_005: Via Violation - Yosys Synthesis Script
+# Target: Nangate45 PDK
+
+# Read design
+read_verilog resources/shift_register.v
+
+# Elaborate
+hierarchy -check -top shift_register
+
+# Synthesis
+synth -top shift_register
+
+# Technology mapping
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+abc -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+# Cleanup
+clean -purge
+
+# Write output
+write_verilog -noattr results/shift_register_synth.v

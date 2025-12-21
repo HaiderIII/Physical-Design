@@ -1,0 +1,21 @@
+# CTS_005: Insertion Delay - Yosys Synthesis Script
+# Target: Nangate45 PDK
+
+# Read design
+read_verilog resources/pipelined_adder.v
+
+# Elaborate
+hierarchy -check -top pipelined_adder
+
+# Synthesis
+synth -top pipelined_adder
+
+# Technology mapping
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+abc -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+# Cleanup
+clean -purge
+
+# Write output
+write_verilog -noattr results/pipelined_adder_synth.v

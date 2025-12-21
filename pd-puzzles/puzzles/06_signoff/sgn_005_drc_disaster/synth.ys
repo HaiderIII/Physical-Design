@@ -1,0 +1,21 @@
+# SGN_005: Hold Horror - Yosys Synthesis Script
+# Target: Nangate45 PDK
+
+# Read design
+read_verilog resources/fast_path.v
+
+# Elaborate
+hierarchy -check -top fast_path
+
+# Synthesis
+synth -top fast_path
+
+# Technology mapping
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+abc -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+# Cleanup
+clean -purge
+
+# Write output
+write_verilog -noattr results/fast_path_synth.v

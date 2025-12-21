@@ -4,7 +4,7 @@
 
 | Phase | Completed | Total | Progress |
 |-------|-----------|-------|----------|
-| 01_synthesis | 4 | 4 | ██████████ |
+| 01_synthesis | 5 | 5 | ██████████ |
 | 02_floorplan | 4 | 4 | ██████████ |
 | 03_placement | 4 | 4 | ██████████ |
 | 04_cts | 4 | 4 | ██████████ |
@@ -47,6 +47,14 @@
 - [x] rte_004 - Congestion Catastrophe
 - [x] sgn_004 - Slew Spiral
 
+### Day 5 - Master (Advanced Concepts)
+- [x] syn_005 - False Path Fiasco
+- [x] flp_005 - Utilization Utopia
+- [x] plc_005 - Routability Ruin
+- [x] cts_005 - Clock Confusion
+- [x] rte_005 - Via Violation
+- [x] sgn_005 - DRC Disaster
+
 ---
 
 ## Achievements
@@ -58,6 +66,7 @@
 | Day 2 Complete | Complete all Day 2 puzzles | [x] |
 | Day 3 Complete | Complete all Day 3 puzzles | [x] |
 | Day 4 Complete | Complete all Day 4 puzzles | [x] |
+| Day 5 Started | Complete first Day 5 puzzle | [x] |
 | Synthesizer | Complete all synthesis puzzles | [x] |
 | Architect | Complete all floorplan puzzles | [x] |
 | Placer | Complete all placement puzzles | [x] |
@@ -98,6 +107,12 @@
 | Day 4 | cts_004 | Sky130HD | 7/7 | Wire RC for CTS, parasitic estimation |
 | Day 4 | rte_004 | Sky130HD | 7/7 | Layer adjustment strategy, congestion |
 | Day 4 | sgn_004 | Sky130HD | 6/7 | Slew constraints, repair_design |
+| Day 5 | syn_005 | Nangate45 | 7/7 | False path wildcards, SDC debugging |
+| Day 5 | flp_005 | Nangate45 | 7/7 | Die/core sizing, utilization calculation |
+| Day 5 | plc_005 | Nangate45 | 7/7 | Layer adjustment, routing congestion |
+| Day 5 | cts_005 | Nangate45 | 5/7 | SDC/Verilog case sensitivity, clock validation |
+| Day 5 | rte_005 | Nangate45 | 6/7 | Routing layer allocation, metal stack usage |
+| Day 5 | sgn_005 | Nangate45 | 6/7 | DRC constraints, repair_design, capacitance |
 
 ---
 
@@ -105,6 +120,6 @@
 
 | PDK | Node | Puzzles Completed |
 |-----|------|-------------------|
-| Nangate45 | 45nm | 6 |
+| Nangate45 | 45nm | 12 |
 | Sky130HD | 130nm | 12 |
 | ASAP7 | 7nm | 6 |

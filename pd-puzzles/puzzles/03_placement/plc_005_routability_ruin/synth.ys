@@ -1,0 +1,24 @@
+# Yosys synthesis script for Matrix Multiplier
+
+read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+read_verilog resources/matrix_mult.v
+
+hierarchy -check -top matrix_mult
+
+proc
+flatten
+opt
+
+techmap
+opt
+
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+abc -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+opt_clean -purge
+
+stat
+
+write_verilog -noattr results/matrix_mult_synth.v
