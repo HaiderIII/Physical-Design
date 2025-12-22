@@ -73,11 +73,29 @@
 
 **Note:** The large flip-flop count (32,800) comes from the 2x 4KB SRAMs synthesized as registers. In a real design, these would be replaced by SRAM macros.
 
-### Phase 3: Floorplanning 🔲
-- [ ] Define die area
-- [ ] Place power pins
-- [ ] Place macros (SRAMs)
-- [ ] Analyze utilization
+### Phase 3: Floorplanning ✅
+- [x] Define die area
+- [x] Create routing tracks
+- [x] Place I/O pins
+- [x] Analyze utilization
+
+**Floorplan Results (2025-12-22):**
+
+| Metric | Value |
+|--------|-------|
+| Die Area | 40,372 µm² |
+| Core Area | ~37,000 µm² |
+| Utilization | 60% |
+| Aspect Ratio | 1.0 (square) |
+| I/O Pins | 130 |
+| Site | asap7sc7p5t |
+
+**Configuration:**
+- Horizontal pin layer: M6
+- Vertical pin layer: M7
+- Core margin: 5 µm
+
+**Note:** No SRAM macros in this design (SRAMs synthesized as flip-flops). In production, SRAM macros would be placed during floorplanning.
 
 **Screenshot espace réservé:**
 ![Floorplan](docs/images/02_floorplan.png)
@@ -181,3 +199,19 @@ yosys -s scripts/01_synthesis.ys
 **Optimisations futures:**
 1. Use SRAM macros instead of synthesized flip-flops to reduce cell count
 2. Consider multi-Vt optimization (mix LVT/RVT/SLVT cells)
+
+### Phase 3 - Floorplanning Notes
+
+**Leçons apprises:**
+1. ASAP7 tech LEF has negative offsets for some layers - need to manually define tracks with positive offsets
+2. Site name found via `grep "^SITE" *.lef` → `asap7sc7p5t`
+3. OpenROAD can read compressed `.lib.gz` files directly (unlike ABC in Yosys)
+
+**Problèmes rencontrés:**
+1. `IFP-0039: Layer M2 has negative routing track offset` - Fixed by manually defining tracks with `make_tracks` command
+2. Wrong site name attempts (`asap7sc7p5t_RVT`, `asap7sc7p5t_28_R`) - Found correct name in LEF file
+
+**Key concepts:**
+- **Utilization**: Ratio of cell area to core area (60% = good balance between routing space and density)
+- **Tracks**: Metal routing grid lines where wires can be placed
+- **Pitch**: Distance between adjacent tracks (smaller = denser routing)
