@@ -97,8 +97,9 @@
 
 **Note:** No SRAM macros in this design (SRAMs synthesized as flip-flops). In production, SRAM macros would be placed during floorplanning.
 
-**Screenshot espace réservé:**
-![Floorplan](docs/images/02_floorplan.png)
+**Screenshots:**
+![Floorplan](docs/images/02_floorplan/Floorplanning.png)
+![Floorplan Zoom](docs/images/02_floorplan/Floorplanning_zoom.png)
 
 ### Phase 4: Placement 🔲
 - [ ] Global placement
