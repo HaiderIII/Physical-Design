@@ -101,14 +101,35 @@
 ![Floorplan](docs/images/02_floorplan/Floorplanning.png)
 ![Floorplan Zoom](docs/images/02_floorplan/Floorplanning_zoom.png)
 
-### Phase 4: Placement 🔲
-- [ ] Global placement
-- [ ] Detailed placement
-- [ ] Check congestion
-- [ ] Optimize placement
+### Phase 4: Placement ✅
+- [x] Global placement
+- [x] Detailed placement
+- [x] Verify placement
+- [x] Generate reports
 
-**Screenshot espace réservé:**
-![Placement](docs/images/03_placement.png)
+**Placement Results (2025-12-22):**
+
+| Metric | Value |
+|--------|-------|
+| Design Area | 40,372 µm² |
+| Utilization | 60% |
+| Total Cells | 391,300 |
+| Sequential Cells | 67,193 |
+| Combinational Cells | 324,107 |
+| Iterations (Global) | 486 |
+| Final Overflow | 9.96% |
+| HPWL (legalized) | 594,819 µm |
+
+**Legalization Metrics:**
+- Average displacement: 0.2 µm
+- Max displacement: 0.8 µm
+- Delta HPWL: +16%
+
+**Note:** Timing violations are expected at this stage (no CTS yet, ideal clocks). The slack will improve after Clock Tree Synthesis.
+
+**Screenshots:**
+![Placement](docs/images/03_placement/placement.png)
+![Placement Zoom](docs/images/03_placement/placement_zoom.png)
 
 ### Phase 5: Clock Tree Synthesis (CTS) 🔲
 - [ ] Build clock tree
@@ -216,3 +237,16 @@ yosys -s scripts/01_synthesis.ys
 - **Utilization**: Ratio of cell area to core area (60% = good balance between routing space and density)
 - **Tracks**: Metal routing grid lines where wires can be placed
 - **Pitch**: Distance between adjacent tracks (smaller = denser routing)
+
+### Phase 4 - Placement Notes
+
+**Leçons apprises:**
+1. `global_placement -density` option is automatically adjusted if target density is too low for available area
+2. ASAP7 LEF files don't have wire RC values defined - need to set manually or skip parasitics estimation
+3. Overflow decreases as placement iterations progress (99% → 10%)
+
+**Key concepts:**
+- **HPWL (Half-Perimeter Wire Length)**: Estimation of total wire length - lower is better
+- **Overflow**: Percentage of cells overlapping - must reach ~10% or less before legalization
+- **Legalization (detailed_placement)**: Snaps cells to legal row positions, may increase HPWL slightly
+- **Displacement**: How much cells moved during legalization (smaller = better global placement quality)
