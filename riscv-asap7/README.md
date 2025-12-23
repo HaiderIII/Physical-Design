@@ -131,14 +131,35 @@
 ![Placement](docs/images/03_placement/placement.png)
 ![Placement Zoom](docs/images/03_placement/placement_zoom.png)
 
-### Phase 5: Clock Tree Synthesis (CTS) 🔲
-- [ ] Build clock tree
-- [ ] Analyze skew
-- [ ] Buffer insertion
-- [ ] Verify timing
+### Phase 5: Clock Tree Synthesis (CTS) ✅
+- [x] Build clock tree (H-Tree topology)
+- [x] Analyze skew
+- [x] Buffer insertion
+- [x] Verify timing
 
-**Screenshot espace réservé:**
-![CTS](docs/images/04_cts.png)
+**CTS Results (2025-12-23):**
+
+| Metric | Value |
+|--------|-------|
+| Clock Sinks (FF) | 67,193 |
+| Clock Buffers Added | 5,307 |
+| Leaf Buffers | 4,480 |
+| Clock Tree Levels | 9 |
+| Path Depth | 8-9 |
+| **Skew** | **10.63 ps** |
+| Avg Sink Wire Length | 390.22 µm |
+
+**Configuration:**
+- Root buffer: BUFx24_ASAP7_75t_R
+- Buffer list: BUFx2, BUFx4, BUFx8, BUFx12
+- Sink clustering diameter: 30 µm
+- Sink clustering size: 15
+
+**Note:** Timing violations remain large due to estimated parasitics. Real timing will be determined after routing.
+
+**Screenshots:**
+![CTS](docs/images/04_cts/cts.png)
+![CTS Zoom](docs/images/04_cts/cts_zoom.png)
 
 ### Phase 6: Routing 🔲
 - [ ] Global routing
@@ -250,3 +271,16 @@ yosys -s scripts/01_synthesis.ys
 - **Overflow**: Percentage of cells overlapping - must reach ~10% or less before legalization
 - **Legalization (detailed_placement)**: Snaps cells to legal row positions, may increase HPWL slightly
 - **Displacement**: How much cells moved during legalization (smaller = better global placement quality)
+
+### Phase 5 - CTS Notes
+
+**Leçons apprises:**
+1. `set_wire_rc` must be called BEFORE `clock_tree_synthesis` to avoid CTS-0104 warning
+2. ASAP7 doesn't have RC values in LEF - must set manually with `set_wire_rc -resistance -capacitance`
+3. Smaller clustering diameter = more buffers but better skew
+
+**Key concepts:**
+- **H-Tree**: Balanced tree topology where clock is distributed hierarchically
+- **Skew**: Difference in clock arrival time between flip-flops (target: < 5% of period)
+- **Sink clustering**: Groups nearby flip-flops to share leaf buffers
+- **CRPR (Clock Reconvergence Pessimism Removal)**: Removes pessimism in timing analysis for common clock paths
