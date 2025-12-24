@@ -164,18 +164,8 @@ puts "Detailed routing complete."
 # Reports
 #-------------------------------------------------------------------------------
 
-puts ""
-puts "Generating reports..."
-
-report_timing -path_type full_clock -delay_type max -sort_by slack -nworst 10 -output $project_dir/results/riscv_soc/05_routing/timing_report.txt
-report_drc -output $project_dir/results/riscv_soc/05_routing/drc_report.txt
-report_routing -output $project_dir/results/riscv_soc/05_routing/routing_report.txt
-
-
-puts "Reports generated."
-
 #-------------------------------------------------------------------------------
-# Save routed DEF
+# Save routed DEF (before reports to avoid losing work if reports fail)
 #-------------------------------------------------------------------------------
 
 puts ""
@@ -185,6 +175,18 @@ file mkdir $project_dir/results/riscv_soc/05_routing
 write_def $project_dir/results/riscv_soc/05_routing/riscv_soc_routed.def
 
 puts "DEF saved to results/riscv_soc/05_routing/riscv_soc_routed.def"
+
+#-------------------------------------------------------------------------------
+# Reports
+#-------------------------------------------------------------------------------
+
+puts ""
+puts "Generating reports..."
+
+report_timing -delay_type max -sort_by slack -max_paths 10 > $project_dir/results/riscv_soc/05_routing/timing_report.txt
+report_design_area > $project_dir/results/riscv_soc/05_routing/area_report.txt
+
+puts "Reports generated."
 
 
 
