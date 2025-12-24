@@ -1,31 +1,37 @@
 # ============================================================================
-# Phase 5: Clock Tree Synthesis (OpenROAD)
+# Phase 2: Floorplanning Script (OpenROAD) - SKY130
 # ============================================================================
 
 puts "=========================================="
-puts "   Phase 5: Clock Tree Synthesis (CTS)"
+puts "   Phase 2: Floorplanning"
 puts "=========================================="
 
 #-------------------------------------------------------------------------------
 # Setup paths
 #-------------------------------------------------------------------------------
 
+# Get project directory (parent of scripts folder)
 set script_dir [file dirname [file normalize [info script]]]
 set project_dir [file dirname $script_dir]
-set platform_dir "$::env(HOME)/OpenROAD-flow-scripts/flow/platforms/asap7"
+
+# SKY130 PDK path (uses HOME environment variable)
+set platform_dir "$::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130hd"
+set sram_dir "$::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130ram/sky130_sram_1rw1r_128x256_8"
 
 puts "Project directory: $project_dir"
 puts "Platform directory: $platform_dir"
+puts "SRAM directory: $sram_dir"
 
 #-------------------------------------------------------------------------------
-# Load LEF files (technology + cells)
+# Load LEF files (technology + cells + macros)
 #-------------------------------------------------------------------------------
 
 puts ""
 puts "Loading LEF files..."
 
-read_lef $platform_dir/lef/asap7_tech_1x_201209.lef
-read_lef $platform_dir/lef/asap7sc7p5t_28_R_1x_220121a.lef
+read_lef $platform_dir/lef/sky130_fd_sc_hd.tlef
+read_lef $platform_dir/lef/sky130_fd_sc_hd_merged.lef
+read_lef $sram_dir/sky130_sram_1rw1r_128x256_8.lef
 
 puts "LEF files loaded."
 
@@ -36,25 +42,22 @@ puts "LEF files loaded."
 puts ""
 puts "Loading Liberty files..."
 
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_INVBUF_RVT_TT_nldm_220122.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_AO_RVT_TT_nldm_211120.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_OA_RVT_TT_nldm_211120.lib.gz
+read_liberty $platform_dir/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_liberty $sram_dir/sky130_sram_1rw1r_128x256_8_TT_1p8V_25C.lib
 
 puts "Liberty files loaded."
 
 #-------------------------------------------------------------------------------
-# Load placement DEF
+# Load synthesized netlist
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Loading placement..."
+puts "Loading synthesized netlist..."
 
-read_def $project_dir/results/riscv_soc/03_placement/riscv_soc_placement.def
+read_verilog $project_dir/results/riscv_soc/01_synthesis/riscv_soc_synth.v
+link_design riscv_soc
 
-
-puts "Placement loaded."
+puts "Netlist loaded and linked."
 
 #-------------------------------------------------------------------------------
 # Load timing constraints (SDC)
@@ -68,63 +71,51 @@ read_sdc $project_dir/constraints/design.sdc
 puts "SDC constraints loaded."
 
 #-------------------------------------------------------------------------------
-# Clock Tree Synthesis
+# Initialize floorplan
 #-------------------------------------------------------------------------------
+# For SKY130 with 2x SRAM macros (~250x500 µm each) + ~85K µm² logic:
+#   - Need ~335K µm² total (logic + SRAMs)
+#   - Site name: unithd
+#   - Consider utilization 40-50% (lower because of macros)
 
-puts ""
-puts "Running clock tree synthesis..."
+# TODO: initialize_floorplan ...
 
-# Set wire RC values (example values, adjust as needed)
-set_wire_rc -signal -resistance 0.0001 -capacitance 0.0001
-set_wire_rc -clock -resistance 0.0001 -capacitance 0.0001
+initialize_floorplan -utilization 30 -aspect_ratio 1.0 -core_space 5 -site unithd
 
-# ASAP7 clock buffers
-set root_buffer "BUFx24_ASAP7_75t_R"
-set buffer_list {BUFx2_ASAP7_75t_R BUFx4_ASAP7_75t_R BUFx8_ASAP7_75t_R BUFx12_ASAP7_75t_R}
+puts "Floorplan initialized."
+#-------------------------------------------------------------------------------
+# Create routing tracks
+#-------------------------------------------------------------------------------
+# Check $platform_dir/make_tracks.tcl for reference
 
-# Run CTS with sink clustering
-clock_tree_synthesis -root_buf $root_buffer \
-                     -buf_list $buffer_list \
-                     -sink_clustering_enable \
-                     -sink_clustering_max_diameter 30 \
-                     -sink_clustering_size 15
+# TODO: source or make_tracks ...
+source $platform_dir/make_tracks.tcl
 
 
-estimate_parasitics -placement
-
-puts "Clock tree synthesis complete."
+puts "Routing tracks created."
 
 #-------------------------------------------------------------------------------
-# Estimate parasitics
+# Place SRAM macros
 #-------------------------------------------------------------------------------
-puts "Parasitics estimated."
+# SRAM macro: sky130_sram_1rw1r_128x256_8
+# Dimensions from LEF: 1141.72 x 632.475 µm
+# Instance names: u_imem/u_sram, u_dmem/u_sram
 
-estimate_parasitics -placement
+# Place SRAMs side by side with R90 (compact square layout)
+# R90 dimensions: 632.475 (W) × 1141.72 (H)
+place_macro -macro_name u_imem/u_sram -location {50 50} -orientation R90
+place_macro -macro_name u_dmem/u_sram -location {750 50} -orientation R90
 
-report_parasitic_annotation
-
-
-#-------------------------------------------------------------------------------
-# Repair clock nets
-#-------------------------------------------------------------------------------
-
-puts ""
-puts "Repairing clock nets..."
-
-repair_clock_nets
-
-puts "Clock nets repaired."
+puts "SRAM macros placed."
 
 #-------------------------------------------------------------------------------
-# Re-legalize placement (buffers added)
+# Place I/O pins
 #-------------------------------------------------------------------------------
+# Use appropriate metal layers for SKY130
 
-puts ""
-puts "Re-legalizing placement..."
-
-detailed_placement
-
-puts "Placement re-legalized."
+# TODO: place_pins ...
+place_pins -hor_layers met3 -ver_layers met2
+puts "I/O pins placed."
 
 #-------------------------------------------------------------------------------
 # Reports
@@ -132,25 +123,22 @@ puts "Placement re-legalized."
 
 puts ""
 puts "Generating reports..."
-
-report_clock_skew
+report_design_area
 report_checks
 
-
-puts "Reports generated."
+# TODO: report_design_area, report_checks ...
 
 #-------------------------------------------------------------------------------
-# Save CTS DEF
+# Save floorplan
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Saving CTS DEF..."
+puts "Saving floorplan DEF..."
 
-file mkdir $project_dir/results/riscv_soc/04_cts
-write_def  $project_dir/results/riscv_soc/04_cts/riscv_soc_cts.def
-
-puts "DEF saved to results/riscv_soc/04_cts/riscv_soc_cts.def"
+file mkdir $project_dir/results/riscv_soc/02_floorplan
+write_def $project_dir/results/riscv_soc/02_floorplan/riscv_soc_floorplan.def
+# TODO: write_def ...
 
 puts "=========================================="
-puts "   CTS complete!"
+puts "   Floorplan setup complete!"
 puts "=========================================="

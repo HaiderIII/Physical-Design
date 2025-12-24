@@ -1,9 +1,9 @@
 # ============================================================================
-# Phase 5: Clock Tree Synthesis (OpenROAD)
+# Phase 6: Routing Script (OpenROAD)
 # ============================================================================
 
 puts "=========================================="
-puts "   Phase 5: Clock Tree Synthesis (CTS)"
+puts "   Phase 6: Routing"
 puts "=========================================="
 
 #-------------------------------------------------------------------------------
@@ -28,7 +28,6 @@ read_lef $platform_dir/lef/asap7_tech_1x_201209.lef
 read_lef $platform_dir/lef/asap7sc7p5t_28_R_1x_220121a.lef
 
 puts "LEF files loaded."
-
 #-------------------------------------------------------------------------------
 # Load Liberty files (timing)
 #-------------------------------------------------------------------------------
@@ -45,16 +44,15 @@ read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_OA_RVT_TT_nldm_211120.lib.gz
 puts "Liberty files loaded."
 
 #-------------------------------------------------------------------------------
-# Load placement DEF
+# Load CTS DEF
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Loading placement..."
+puts "Loading CTS result..."
 
-read_def $project_dir/results/riscv_soc/03_placement/riscv_soc_placement.def
+read_def $project_dir/results/riscv_soc/04_cts/riscv_soc_cts.def
 
-
-puts "Placement loaded."
+puts "CTS loaded."
 
 #-------------------------------------------------------------------------------
 # Load timing constraints (SDC)
@@ -68,63 +66,38 @@ read_sdc $project_dir/constraints/design.sdc
 puts "SDC constraints loaded."
 
 #-------------------------------------------------------------------------------
-# Clock Tree Synthesis
+# Set wire RC for parasitics
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Running clock tree synthesis..."
+puts "Setting wire RC..."
 
-# Set wire RC values (example values, adjust as needed)
 set_wire_rc -signal -resistance 0.0001 -capacitance 0.0001
 set_wire_rc -clock -resistance 0.0001 -capacitance 0.0001
 
-# ASAP7 clock buffers
-set root_buffer "BUFx24_ASAP7_75t_R"
-set buffer_list {BUFx2_ASAP7_75t_R BUFx4_ASAP7_75t_R BUFx8_ASAP7_75t_R BUFx12_ASAP7_75t_R}
-
-# Run CTS with sink clustering
-clock_tree_synthesis -root_buf $root_buffer \
-                     -buf_list $buffer_list \
-                     -sink_clustering_enable \
-                     -sink_clustering_max_diameter 30 \
-                     -sink_clustering_size 15
-
-
-estimate_parasitics -placement
-
-puts "Clock tree synthesis complete."
+puts "Wire RC set."
 
 #-------------------------------------------------------------------------------
-# Estimate parasitics
-#-------------------------------------------------------------------------------
-puts "Parasitics estimated."
-
-estimate_parasitics -placement
-
-report_parasitic_annotation
-
-
-#-------------------------------------------------------------------------------
-# Repair clock nets
+# Global routing
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Repairing clock nets..."
+puts "Running global routing..."
 
-repair_clock_nets
+global_route 
 
-puts "Clock nets repaired."
+puts "Global routing complete."
 
 #-------------------------------------------------------------------------------
-# Re-legalize placement (buffers added)
+# Detailed routing
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Re-legalizing placement..."
+puts "Running detailed routing (this may take several minutes)..."
 
-detailed_placement
+detailed_route
 
-puts "Placement re-legalized."
+puts "Detailed routing complete."
 
 #-------------------------------------------------------------------------------
 # Reports
@@ -133,24 +106,25 @@ puts "Placement re-legalized."
 puts ""
 puts "Generating reports..."
 
-report_clock_skew
-report_checks
+report_timing -path_type full_clock -delay_type max -sort_by slack -nworst 10 -output $project_dir/results/riscv_soc/05_routing/timing_report.txt
+report_drc -output $project_dir/results/riscv_soc/05_routing/drc_report.txt
+report_routing -output $project_dir/results/riscv_soc/05_routing/routing_report.txt
 
 
 puts "Reports generated."
 
 #-------------------------------------------------------------------------------
-# Save CTS DEF
+# Save routed DEF
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Saving CTS DEF..."
+puts "Saving routed DEF..."
 
-file mkdir $project_dir/results/riscv_soc/04_cts
-write_def  $project_dir/results/riscv_soc/04_cts/riscv_soc_cts.def
+file mkdir $project_dir/results/riscv_soc/05_routing
+write_def $project_dir/results/riscv_soc/05_routing/riscv_soc_routed.def
 
-puts "DEF saved to results/riscv_soc/04_cts/riscv_soc_cts.def"
+puts "DEF saved to results/riscv_soc/05_routing/riscv_soc_routed.def"
 
 puts "=========================================="
-puts "   CTS complete!"
+puts "   Routing complete!"
 puts "=========================================="

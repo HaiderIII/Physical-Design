@@ -1,0 +1,20 @@
+# Synthesis outputs
+results/
+*.log
+
+# OpenROAD outputs
+*.odb
+*.def
+*.spef
+*.sdf
+
+# Reports
+reports/*.rpt
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# OS files
+.DS_Store

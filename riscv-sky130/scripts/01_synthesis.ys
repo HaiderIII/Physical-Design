@@ -1,0 +1,106 @@
+# ============================================================================
+# Phase 1: Synthesis Script (Yosys) - SKY130
+# ============================================================================
+# Project: RISC-V Physical Design with SKY130 + SRAM Macros
+# Target: sky130_fd_sc_hd (High Density) @ 100 MHz
+# SRAM: sky130_sram_1rw1r_128x256_8 macros (blackboxed)
+# ============================================================================
+
+log "=========================================="
+log "   Phase 1: Synthesis (SKY130)"
+log "=========================================="
+
+#-------------------------------------------------------------------------------
+# Step 1: Read Liberty files
+#-------------------------------------------------------------------------------
+
+log "Loading SKY130 Liberty files..."
+
+# Standard cells
+read_liberty -lib $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# SRAM macro
+read_liberty -lib $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130ram/sky130_sram_1rw1r_128x256_8/sky130_sram_1rw1r_128x256_8_TT_1p8V_25C.lib
+
+#-------------------------------------------------------------------------------
+# Step 2: Read RTL design
+#-------------------------------------------------------------------------------
+
+log "Loading RTL design..."
+
+read_verilog -sv src/riscv_pkg.v
+read_verilog -sv src/register_file.v
+read_verilog -sv src/alu.v
+read_verilog -sv src/decoder.v
+read_verilog -sv src/branch_unit.v
+read_verilog -sv src/hazard_unit.v
+read_verilog -sv src/memory_controller.v
+read_verilog -sv src/pipeline_registers.v
+read_verilog -sv src/sram_wrapper_4kb.v
+read_verilog -sv src/riscv_core.v
+read_verilog -sv src/riscv_soc.v
+
+# SRAM macro Verilog (for hierarchy)
+read_verilog $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130ram/sky130_sram_1rw1r_128x256_8/sky130_sram_1rw1r_128x256_8.v
+
+#-------------------------------------------------------------------------------
+# Step 3: Elaborate design
+#-------------------------------------------------------------------------------
+
+log "Elaborating design..."
+
+hierarchy -check -top riscv_soc
+
+#-------------------------------------------------------------------------------
+# Step 4: Blackbox SRAM macros
+#-------------------------------------------------------------------------------
+
+log "Blackboxing SRAM macros..."
+
+setattr -mod -set blackbox 1 sky130_sram_1rw1r_128x256_8
+
+#-------------------------------------------------------------------------------
+# Step 5: Synthesis
+#-------------------------------------------------------------------------------
+
+log "Running synthesis..."
+
+synth -top riscv_soc
+
+#-------------------------------------------------------------------------------
+# Step 6: Technology mapping
+#-------------------------------------------------------------------------------
+
+log "Mapping to SKY130 cells..."
+
+# Map flip-flops
+dfflibmap -liberty $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Map combinational logic
+abc -liberty $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+#-------------------------------------------------------------------------------
+# Step 7: Clean up
+#-------------------------------------------------------------------------------
+
+opt_clean -purge
+
+#-------------------------------------------------------------------------------
+# Step 8: Write netlist
+#-------------------------------------------------------------------------------
+
+log "Writing netlist..."
+
+write_verilog -noattr results/riscv_soc/01_synthesis/riscv_soc_synth.v
+
+#-------------------------------------------------------------------------------
+# Step 9: Statistics
+#-------------------------------------------------------------------------------
+
+log "Generating statistics..."
+
+stat -liberty $::env(HOME)/OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+log "=========================================="
+log "   Synthesis complete!"
+log "=========================================="
