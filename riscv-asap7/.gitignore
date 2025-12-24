@@ -1,2 +1,9 @@
 lib/
-results/
+# Ignore results except DEF and synthesized Verilog
+results/**/*
+!results/
+!results/*/
+!results/*/*/
+!results/*/*/*/
+!results/**/*.def
+!results/**/*.v
