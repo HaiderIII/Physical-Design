@@ -201,22 +201,30 @@ External Interface (32-bit)          SRAM Macro (128-bit)
 
 ![CTS Zoom](docs/images/04_cts/cts_zoom.png)
 
-### Phase 6: Routing 🔲
-- [ ] Global routing
-- [ ] Detailed routing
-- [ ] Fix DRC violations
-- [ ] Antenna fixes
+### Phase 6: Routing ✅
+- [x] Global routing
+- [x] Detailed routing
+- [x] Multi-threading (10 threads on Mac M4)
+- [x] Tie-net fix (one_/zero_ reclassified as SIGNAL)
 
-**Routing Results:**
+**Routing Results (2024-12-24):**
 
 | Metric | Value |
 |--------|-------|
-| Total Wirelength | - |
-| Via Count | - |
-| DRC Violations | - |
+| Routing Layers | li1-met5 (signal), met3-met5 (clock) |
+| DEF Size | 14 MB (236K lines) |
+| Tie Nets Fixed | 7 (one_, zero_, hierarchical) |
+
+**Key Fixes Applied:**
+- PDN setup with `add_global_connection` for VPWR/VPB/VGND/VNB
+- Tie-cell nets (one_, zero_) reclassified from POWER/GROUND to SIGNAL
+- Pattern matching for hierarchical names (u_dmem/one_, u_imem/zero_, etc.)
 
 **Screenshots:**
+
 ![Routing](docs/images/05_routing/routing.png)
+
+![Routing Zoom](docs/images/05_routing/routing_zoom.png)
 
 ### Phase 7: Signoff 🔲
 - [ ] Static Timing Analysis (STA)
