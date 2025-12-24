@@ -21,6 +21,10 @@ puts "=========================================="
 puts "   Phase 5: Routing (SKY130)"
 puts "=========================================="
 
+# Utiliser plusieurs threads pour accelerer le routing
+set_thread_count [exec nproc]
+puts "Using [exec nproc] threads"
+
 #-------------------------------------------------------------------------------
 # Setup paths
 #-------------------------------------------------------------------------------

@@ -29,6 +29,7 @@ if [ $# -eq 0 ]; then
     echo ""
     docker run -it --rm \
         --platform linux/amd64 \
+        -e HOME=/ \
         -v "$WORKDIR:/work" \
         -w /work \
         $IMAGE \
@@ -40,10 +41,27 @@ else
     else
         TTY_FLAG="-i"
     fi
-    docker run $TTY_FLAG --rm \
-        --platform linux/amd64 \
-        -v "$WORKDIR:/work" \
-        -w /work \
-        $IMAGE \
-        bash -c "source /OpenROAD-flow-scripts/env.sh && $*"
+    # Pour Yosys: convertir $::env(HOME) en chemin absolu dans les scripts .ys
+    CMD="$*"
+    if [[ "$CMD" == *"yosys"* ]] && [[ "$CMD" == *".ys"* ]]; then
+        # Extraire le fichier .ys et son repertoire parent
+        YS_FILE=$(echo "$CMD" | grep -oE '[^ ]+\.ys')
+        YS_DIR=$(dirname "$YS_FILE")
+        PROJECT_DIR=$(dirname "$YS_DIR")
+        docker run $TTY_FLAG --rm \
+            --platform linux/amd64 \
+            -e HOME=/ \
+            -v "$WORKDIR:/work" \
+            -w "$PROJECT_DIR" \
+            $IMAGE \
+            bash -c "source /OpenROAD-flow-scripts/env.sh && sed 's|\$::env(HOME)|/|g' $YS_FILE > /tmp/script.ys && yosys /tmp/script.ys"
+    else
+        docker run $TTY_FLAG --rm \
+            --platform linux/amd64 \
+            -e HOME=/ \
+            -v "$WORKDIR:/work" \
+            -w /work \
+            $IMAGE \
+            bash -c "source /OpenROAD-flow-scripts/env.sh && $*"
+    fi
 fi
