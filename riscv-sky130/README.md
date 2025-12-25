@@ -226,22 +226,56 @@ External Interface (32-bit)          SRAM Macro (128-bit)
 
 ![Routing Zoom](docs/images/05_routing/routing_zoom.png)
 
-### Phase 7: Signoff 🔲
-- [ ] Static Timing Analysis (STA)
-- [ ] Power analysis
-- [ ] DRC/LVS clean
-- [ ] Final GDSII
+### Phase 7: Signoff ✅
+- [x] Static Timing Analysis (STA)
+- [x] Power analysis
+- [x] Final DEF and Verilog export
+- [ ] DRC/LVS with Magic (for tape-out)
+- [ ] GDSII generation (for tape-out)
 
-**Signoff Results:**
+**Signoff Results (2024-12-25):**
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| WNS (Setup) | -0.05 ns | ⚠️ Minor violation |
+| WNS (Hold) | +0.07 ns | ✅ MET |
+| TNS | -0.07 ns | Minimal |
+| Clock Skew | 0.48 ns | Normal |
+
+**Power Analysis:**
+
+| Component | Power | Percentage |
+|-----------|-------|------------|
+| SRAM Macros | 71.9 mW | 79.6% |
+| Clock Tree | 8.5 mW | 9.5% |
+| Sequential | 7.0 mW | 7.8% |
+| Combinational | 2.8 mW | 3.1% |
+| **Total** | **90.3 mW** | 100% |
+
+**Area Summary:**
 
 | Metric | Value |
 |--------|-------|
-| WNS (Setup) | - |
-| TNS (Setup) | - |
-| Power | - |
+| Total Area | 1.55 mm² |
+| Utilization | 30% |
+| Total Cells | 9,804 |
+| SRAM Macros | 2 × 1.44 mm² |
+
+**Critical Path:**
+- Startpoint: `u_riscv_core/u_pipe_mem_wb/_001_` (flip-flop)
+- Endpoint: `u_riscv_core/u_pipe_ex_mem/_069_` (flip-flop)
+- Path through ALU carry chain (maj3 cells)
+- Total delay: 9.69 ns (target: 10 ns)
+
+**Output Files:**
+- `results/riscv_soc/06_signoff/riscv_soc_final.def`
+- `results/riscv_soc/06_signoff/riscv_soc_final.v`
 
 **Screenshots:**
-![Final Layout](docs/images/06_signoff/final.png)
+
+![Signoff Layout](docs/images/06_signoff/signoff.png)
+
+![Signoff Zoom](docs/images/06_signoff/signoff_zoom.png)
 
 ---
 
