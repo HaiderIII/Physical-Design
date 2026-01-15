@@ -1,6 +1,7 @@
 // ============================================================================
 // RISC-V RV32I Core - 5-Stage Pipeline
 // ============================================================================
+// Project: RISC-V Physical Design with SKY130 + SRAM Macros
 // Pipeline stages: IF -> ID -> EX -> MEM -> WB
 // Features: Data forwarding, hazard detection, branch prediction (static)
 // ============================================================================

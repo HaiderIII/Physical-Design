@@ -7,7 +7,8 @@
 | **Design** | RISC-V RV32I 5-Stage Pipeline CPU |
 | **Target PDK** | ASAP7 (7nm FinFET) |
 | **Target Frequency** | 500 MHz (2ns period) |
-| **Estimated Gates** | ~200K (with synthesized SRAMs) |
+| **Standard Cells** | asap7sc7p5t |
+| **SRAM** | Fake SRAM (synthesized to flip-flops) |
 | **Tools** | Yosys + OpenROAD |
 
 ## Architecture
@@ -23,161 +24,101 @@
 │  │     ↑        │        │                                  │  │
 │  │     └────────┴────────┘ (Forwarding & Hazard)           │  │
 │  └──────────────────────────────────────────────────────────┘  │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐               │
-│  │   IMEM     │  │    DMEM    │  │    GPIO    │               │
-│  │   4KB      │  │    4KB     │  │   32-bit   │               │
-│  └────────────┘  └────────────┘  └────────────┘               │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────┐       │
+│  │  IMEM (SRAM)   │  │  DMEM (SRAM)   │  │    GPIO    │       │
+│  │  Fake (FF)     │  │   Fake (FF)    │  │   32-bit   │       │
+│  └────────────────┘  └────────────────┘  └────────────┘       │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+## Fake SRAM vs Real SRAM
+
+| Aspect | Real SRAM (SKY130) | Fake SRAM (ASAP7) |
+|--------|-------------------|-------------------|
+| **Implementation** | Hard macro (OpenRAM) | Flip-flops |
+| **Synthesis** | Blackboxed | Fully synthesized |
+| **Area** | Compact (~0.7 mm²) | Large (many FFs) |
+| **Timing** | Fixed (from .lib) | Depends on synthesis |
+| **Why?** | Macro available | No ASAP7 SRAM macro |
+
+---
 
 ## Progress Tracker
 
 ### Phase 1: RTL Design ✅
-- [x] RISC-V package (opcodes, constants)
-- [x] Register file (32x32-bit)
-- [x] ALU (all RV32I operations)
-- [x] Instruction decoder
-- [x] Branch unit
-- [x] Hazard detection & forwarding
-- [x] Pipeline registers (IF/ID, ID/EX, EX/MEM, MEM/WB)
-- [x] Memory controller
-- [x] SRAM model
-- [x] Top-level SoC
+- [x] RISC-V core (same as SKY130)
+- [x] Fake SRAM module (synthesizable)
+- [x] Top-level SoC integration
+- [x] Verify synthesis compatibility
 
 ### Phase 2: Synthesis ✅
-- [x] Verify RTL syntax with Yosys
-- [x] Run synthesis
-- [x] Analyze gate count
-- [x] Technology mapping to ASAP7 cells
+- [x] Yosys synthesis to ASAP7 cells
+- [x] Gate count: **164,673 cells** (32,800 DFFs for fake SRAM)
+- [x] ABC mapping with AO/OA/INVBUF/SIMPLE libraries
 
-**Synthesis Results (2025-12-20):**
-
-| Metric | Value |
-|--------|-------|
-| Total Cells | ~201,740 |
-| Flip-flops | 34,393 |
-| Combinational Logic | ~167,347 |
-| Netlist Size | 23 MB |
-
-**Cell Distribution:**
-
-| Cell Type | Count | Description |
-|-----------|-------|-------------|
-| NAND2xp33_ASAP7 | 117,764 | 2-input NAND |
-| NAND3xp33_ASAP7 | 36,348 | 3-input NAND |
-| DFFHQNx1_ASAP7 | 32,800 | D Flip-flop (SRAM) |
-| NAND4xp25_ASAP7 | 12,826 | 4-input NAND |
-| DFFASRHQNx1_ASAP7 | 1,593 | DFF with async reset |
-| XOR2x2_ASAP7 | 42 | 2-input XOR |
-| Others | ~367 | NOR, MAJ, OR, XNOR |
-
-**Note:** The large flip-flop count (32,800) comes from the 2x 4KB SRAMs synthesized as registers. In a real design, these would be replaced by SRAM macros.
+**Synthesis Statistics:**
+| Cell Type | Count |
+|-----------|-------|
+| DFFHQNx1_ASAP7_75t_R | 32,800 |
+| DFFASRHQNx1_ASAP7_75t_R | 474 |
+| AOI21xp33_ASAP7_75t_R | 32,576 |
+| NOR2xp33_ASAP7_75t_R | 35,082 |
+| AND2x2_ASAP7_75t_R | 12,816 |
+| Other combinational | ~50,925 |
+| **Total** | **164,673** |
 
 ### Phase 3: Floorplanning ✅
-- [x] Define die area
-- [x] Create routing tracks
-- [x] Place I/O pins
-- [x] Analyze utilization
+- [x] Define die area: **228 × 228 µm**
+- [x] Core area: **218 × 218 µm**
+- [x] Create 808 placement rows
+- [x] Place 130 I/O pins (M4/M5 layers)
 
-**Floorplan Results (2025-12-22):**
+![Floorplan Overview](docs/images/02_floorplan/floorplanning.png)
 
-| Metric | Value |
-|--------|-------|
-| Die Area | 40,372 µm² |
-| Core Area | ~37,000 µm² |
-| Utilization | 60% |
-| Aspect Ratio | 1.0 (square) |
-| I/O Pins | 130 |
-| Site | asap7sc7p5t |
-
-**Configuration:**
-- Horizontal pin layer: M6
-- Vertical pin layer: M7
-- Core margin: 5 µm
-
-**Note:** No SRAM macros in this design (SRAMs synthesized as flip-flops). In production, SRAM macros would be placed during floorplanning.
-
-**Screenshots:**
-![Floorplan](docs/images/02_floorplan/Floorplanning.png)
-![Floorplan Zoom](docs/images/02_floorplan/Floorplanning_zoom.png)
+![Floorplan I/O Pins](docs/images/02_floorplan/floorplanning_port.png)
 
 ### Phase 4: Placement ✅
-- [x] Global placement
-- [x] Detailed placement
-- [x] Verify placement
-- [x] Generate reports
+- [x] Global placement (density: 60%)
+- [x] Detail placement (legalization)
+- [x] **Design area:** 19,106 µm² @ 45% utilization
 
-**Placement Results (2025-12-22):**
+![Placement Global View](docs/images/03_placement/placement_global_view.png)
 
-| Metric | Value |
-|--------|-------|
-| Design Area | 40,372 µm² |
-| Utilization | 60% |
-| Total Cells | 391,300 |
-| Sequential Cells | 67,193 |
-| Combinational Cells | 324,107 |
-| Iterations (Global) | 486 |
-| Final Overflow | 9.96% |
-| HPWL (legalized) | 594,819 µm |
-
-**Legalization Metrics:**
-- Average displacement: 0.2 µm
-- Max displacement: 0.8 µm
-- Delta HPWL: +16%
-
-**Note:** Timing violations are expected at this stage (no CTS yet, ideal clocks). The slack will improve after Clock Tree Synthesis.
-
-**Screenshots:**
-![Placement](docs/images/03_placement/placement.png)
 ![Placement Zoom](docs/images/03_placement/placement_zoom.png)
 
 ### Phase 5: Clock Tree Synthesis (CTS) ✅
-- [x] Build clock tree (H-Tree topology)
-- [x] Analyze skew
-- [x] Buffer insertion
-- [x] Verify timing
+- [x] Build clock tree (500 MHz target)
+- [x] Buffer insertion: **6,303 clock buffers**
+- [x] Tree depth: **8 levels**
+- [x] Clock skew: **35.03 ps**
 
-**CTS Results (2025-12-23):**
+![CTS Overview](docs/images/04_cts/cts_overview.png)
 
-| Metric | Value |
-|--------|-------|
-| Clock Sinks (FF) | 67,193 |
-| Clock Buffers Added | 5,307 |
-| Leaf Buffers | 4,480 |
-| Clock Tree Levels | 9 |
-| Path Depth | 8-9 |
-| **Skew** | **10.63 ps** |
-| Avg Sink Wire Length | 390.22 µm |
-
-**Configuration:**
-- Root buffer: BUFx24_ASAP7_75t_R
-- Buffer list: BUFx2, BUFx4, BUFx8, BUFx12
-- Sink clustering diameter: 30 µm
-- Sink clustering size: 15
-
-**Note:** Timing violations remain large due to estimated parasitics. Real timing will be determined after routing.
-
-**Screenshots:**
-![CTS](docs/images/04_cts/cts.png)
-![CTS Zoom](docs/images/04_cts/cts_zoom.png)
+![CTS Clock Tree](docs/images/04_cts/cts_zoom.png)
 
 ### Phase 6: Routing 🔲
 - [ ] Global routing
-- [ ] Detailed routing
-- [ ] Fix DRC violations
-- [ ] Antenna fixes
-
-**Screenshot espace réservé:**
-![Routing](docs/images/05_routing.png)
+- [ ] Detailed routing (9 metal layers)
+- [ ] DRC fixes
 
 ### Phase 7: Signoff 🔲
-- [ ] Static Timing Analysis (STA)
+- [ ] Static Timing Analysis
 - [ ] Power analysis
-- [ ] DRC/LVS clean
-- [ ] Final GDSII
+- [ ] Final reports
 
-**Screenshot espace réservé:**
-![Final Layout](docs/images/06_final.png)
+---
+
+## Key Differences vs SKY130 Project
+
+| Aspect | ASAP7 (7nm) | SKY130 (130nm) |
+|--------|-------------|----------------|
+| Target Frequency | 500 MHz | 100 MHz |
+| Clock Period | 2 ns | 10 ns |
+| SRAM | Fake (flip-flops) | Real macros |
+| Cell Library | asap7sc7p5t | sky130_fd_sc_hd |
+| Metal Layers | 9 (M1-M9) | 5 (li1-met5) |
+| VDD | 0.7 V | 1.8 V |
+| Min Feature | 7 nm | 130 nm |
 
 ---
 
@@ -185,102 +126,103 @@
 
 ```
 riscv-asap7/
-├── README.md                 # This file (progress tracker)
-├── docs/
-│   └── images/              # Screenshots from OpenROAD GUI
-├── src/
-│   ├── riscv_pkg.v          # Constants & defines
-│   ├── register_file.v      # 32x32 register file
-│   ├── alu.v                # Arithmetic Logic Unit
-│   ├── decoder.v            # Instruction decoder
-│   ├── branch_unit.v        # Branch condition evaluation
-│   ├── hazard_unit.v        # Hazard detection & forwarding
-│   ├── memory_controller.v  # Load/Store unit
-│   ├── pipeline_registers.v # All pipeline registers
-│   ├── sram_32x1024.v       # SRAM model (4KB)
-│   ├── riscv_core.v         # CPU core (5-stage pipeline)
-│   └── riscv_soc.v          # Top-level SoC
+├── README.md                 # This file
+├── src/                      # RTL source files
+│   ├── riscv_pkg.v
+│   ├── alu.v
+│   ├── decoder.v
+│   ├── register_file.v
+│   ├── branch_unit.v
+│   ├── hazard_unit.v
+│   ├── memory_controller.v
+│   ├── pipeline_registers.v
+│   ├── fake_sram.v           # Synthesizable SRAM
+│   ├── riscv_core.v
+│   └── riscv_soc.v
 ├── constraints/
-│   └── design.sdc           # Timing constraints
-├── scripts/                 # TCL scripts for each phase
-├── results/                 # Output files
-└── reports/                 # Timing, area, power reports
+│   └── design.sdc            # 500 MHz timing constraints
+├── scripts/
+│   ├── 01_synthesis.ys
+│   ├── 02_floorplan.tcl
+│   ├── 03_placement.tcl
+│   ├── 04_cts.tcl
+│   ├── 05_routing.tcl
+│   └── 06_signoff.tcl
+├── docs/
+│   ├── images/               # Screenshots
+│   ├── quiz_phase1_rtl.md
+│   ├── quiz_phase2_synthesis.md
+│   ├── quiz_phase3_floorplan.md
+│   ├── quiz_phase4_placement.md
+│   ├── quiz_phase5_cts.md
+│   └── quiz_phase6_routing.md
+└── results/                  # Output files
+    └── riscv_soc/
+        ├── 01_synthesis/
+        ├── 02_floorplan/
+        ├── 03_placement/
+        └── ...
 ```
+
+---
+
+## Quiz Progress
+
+| Phase | Quiz | Score |
+|-------|------|-------|
+| Phase 1 | RTL Design | ✅ 5/5 |
+| Phase 2 | Synthesis | ✅ 4/5 |
+| Phase 3 | Floorplan | ✅ 5/5 |
+| Phase 4 | Placement | ✅ 5/5 |
+| Phase 5 | CTS | ✅ 4/5 |
 
 ---
 
 ## How to Run
 
-### Test GUI OpenROAD
 ```bash
-cd ~/projects/Physical-Design/riscv-asap7
-openroad -gui
-```
-
-### Run Synthesis
-```bash
-cd ~/projects/Physical-Design/riscv-asap7
-mkdir -p results/riscv_soc/01_synthesis
+# Phase 2: Synthesis
+cd riscv-asap7
 yosys -s scripts/01_synthesis.ys
+
+# Phase 3: Floorplan
+openroad -no_init scripts/02_floorplan.tcl
+
+# Phase 4: Placement
+openroad -no_init scripts/03_placement.tcl
+
+# Phase 5: CTS
+openroad -no_init scripts/04_cts.tcl
+
+# Phase 6: Routing
+openroad -no_init scripts/05_routing.tcl
+
+# View results in GUI
+openroad -gui scripts/view_placement.tcl
+openroad -gui scripts/view_cts.tcl
 ```
 
 ---
 
-## Notes & Observations
+## Notes & Learnings
 
-### Phase 2 - Synthesis Notes
+### Synthesis Challenges
+- ABC requires multiple liberty files (AO, OA, INVBUF, SIMPLE, SEQ)
+- Using compressed `.lib.gz` files with `-script abc_speed.script` is essential
+- `setundef -zero` must be called before ABC to replace X values
 
-**Leçons apprises:**
-1. ABC (technology mapper) cannot read compressed `.lib.gz` files directly - need to decompress first
-2. Yosys `.ys` scripts use `log` command instead of `echo` for messages
-3. ASAP7 cells are split across multiple liberty files (SIMPLE, SEQ, INVBUF, AO, OA)
+### Floorplan Observations
+- 164,673 cells with 45% utilization
+- Die size ~228 µm × 228 µm (very small at 7nm!)
+- I/O pins placed on M4 (horizontal) and M5 (vertical)
 
-**Problèmes rencontrés:**
-1. `ABC failed with status 8B` - Fixed by decompressing the liberty file
-2. Duplicate `abc -liberty abc -liberty` typo in script
+### Placement Results
+- Global placement converged at iteration 487
+- HPWL: 1.26 million µm after legalization
+- Timing: WNS = -36.7 ns (will improve after CTS and routing)
 
-**Optimisations futures:**
-1. Use SRAM macros instead of synthesized flip-flops to reduce cell count
-2. Consider multi-Vt optimization (mix LVT/RVT/SLVT cells)
-
-### Phase 3 - Floorplanning Notes
-
-**Leçons apprises:**
-1. ASAP7 tech LEF has negative offsets for some layers - need to manually define tracks with positive offsets
-2. Site name found via `grep "^SITE" *.lef` → `asap7sc7p5t`
-3. OpenROAD can read compressed `.lib.gz` files directly (unlike ABC in Yosys)
-
-**Problèmes rencontrés:**
-1. `IFP-0039: Layer M2 has negative routing track offset` - Fixed by manually defining tracks with `make_tracks` command
-2. Wrong site name attempts (`asap7sc7p5t_RVT`, `asap7sc7p5t_28_R`) - Found correct name in LEF file
-
-**Key concepts:**
-- **Utilization**: Ratio of cell area to core area (60% = good balance between routing space and density)
-- **Tracks**: Metal routing grid lines where wires can be placed
-- **Pitch**: Distance between adjacent tracks (smaller = denser routing)
-
-### Phase 4 - Placement Notes
-
-**Leçons apprises:**
-1. `global_placement -density` option is automatically adjusted if target density is too low for available area
-2. ASAP7 LEF files don't have wire RC values defined - need to set manually or skip parasitics estimation
-3. Overflow decreases as placement iterations progress (99% → 10%)
-
-**Key concepts:**
-- **HPWL (Half-Perimeter Wire Length)**: Estimation of total wire length - lower is better
-- **Overflow**: Percentage of cells overlapping - must reach ~10% or less before legalization
-- **Legalization (detailed_placement)**: Snaps cells to legal row positions, may increase HPWL slightly
-- **Displacement**: How much cells moved during legalization (smaller = better global placement quality)
-
-### Phase 5 - CTS Notes
-
-**Leçons apprises:**
-1. `set_wire_rc` must be called BEFORE `clock_tree_synthesis` to avoid CTS-0104 warning
-2. ASAP7 doesn't have RC values in LEF - must set manually with `set_wire_rc -resistance -capacitance`
-3. Smaller clustering diameter = more buffers but better skew
-
-**Key concepts:**
-- **H-Tree**: Balanced tree topology where clock is distributed hierarchically
-- **Skew**: Difference in clock arrival time between flip-flops (target: < 5% of period)
-- **Sink clustering**: Groups nearby flip-flops to share leaf buffers
-- **CRPR (Clock Reconvergence Pessimism Removal)**: Removes pessimism in timing analysis for common clock paths
+### CTS Results
+- Clock buffers inserted: 6,303 (BUFx2 to BUFx12)
+- Tree depth: 8 levels (H-tree topology)
+- Clock skew: 35.03 ps (excellent for 2ns period)
+- Root buffer: BUFx12_ASAP7_75t_R

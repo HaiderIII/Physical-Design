@@ -1,10 +1,8 @@
 // ============================================================================
 // RISC-V RV32I Package - Constants and Definitions
 // ============================================================================
-// Project: Complex ASAP7 Physical Design
-// Author: Faiz (with Claude assistance for RTL generation)
-// Description: Package containing all RISC-V RV32I constants, opcodes, and
-//              function codes used throughout the processor design.
+// Project: RISC-V Physical Design with SKY130 + SRAM Macros
+// Target: SKY130 (130nm) @ 100 MHz
 // ============================================================================
 
 // Opcodes (bits [6:0] of instruction)

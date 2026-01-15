@@ -1,90 +1,107 @@
 # ============================================================================
-# Phase 1: Synthesis Script (Yosys)
+# Phase 2: Synthesis Script (Yosys) - ASAP7
+# ============================================================================
+# Tool: Yosys (Open Source Synthesis)
+# Target: ASAP7 7nm FinFET
+# Frequency: 500 MHz (2ns period)
 # ============================================================================
 
-log "=========================================="
-log "   Phase 1: Synthesis"
-log "=========================================="
+# ===========================================================================
+# Step 1: Read RTL files
+# ===========================================================================
 
-#-------------------------------------------------------------------------------
-# Step 1: Load Liberty files
-#-------------------------------------------------------------------------------
+read_verilog src/riscv_pkg.v
+read_verilog src/alu.v
+read_verilog src/decoder.v
+read_verilog src/register_file.v
+read_verilog src/branch_unit.v
+read_verilog src/hazard_unit.v
+read_verilog src/memory_controller.v
+read_verilog src/pipeline_registers.v
+read_verilog src/riscv_core.v
+read_verilog src/fake_sram.v
+read_verilog src/riscv_soc.v
 
-log "Loading ASAP7 Liberty files..."
-
-read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib.gz
-read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
-read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_INVBUF_RVT_TT_nldm_220122.lib.gz
-read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_AO_RVT_TT_nldm_211120.lib.gz
-read_liberty -lib /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_OA_RVT_TT_nldm_211120.lib.gz
-
-#-------------------------------------------------------------------------------
-# Step 2: Load RTL design
-#-------------------------------------------------------------------------------
-
-log "Loading RTL design..."
-
-read_verilog -sv src/riscv_pkg.v
-read_verilog -sv src/register_file.v
-read_verilog -sv src/alu.v
-read_verilog -sv src/decoder.v
-read_verilog -sv src/branch_unit.v
-read_verilog -sv src/hazard_unit.v
-read_verilog -sv src/memory_controller.v
-read_verilog -sv src/pipeline_registers.v
-read_verilog -sv src/sram_32x1024.v
-read_verilog -sv src/riscv_core.v
-read_verilog -sv src/riscv_soc.v
-
-#-------------------------------------------------------------------------------
-# Step 3: Elaborate design
-#-------------------------------------------------------------------------------
-
-log "Elaborating design..."
+# ===========================================================================
+# Step 2: Elaboration
+# ===========================================================================
 
 hierarchy -check -top riscv_soc
 
-#-------------------------------------------------------------------------------
-# Step 4: Synthesis
-#-------------------------------------------------------------------------------
+# ===========================================================================
+# Step 3: High-level synthesis
+# ===========================================================================
 
-log "Running synthesis..."
+proc
+opt
+flatten
+opt
+fsm
+opt
 
-synth -top riscv_soc
+# Convert ALL memories to flip-flops (no SRAM macros in ASAP7)
+memory -nomap
+memory_dff
+memory_map
+opt
 
-#-------------------------------------------------------------------------------
-# Step 5: Technology mapping
-#-------------------------------------------------------------------------------
+# ===========================================================================
+# Step 4: Technology Mapping to ASAP7
+# ===========================================================================
 
-log "Mapping to ASAP7 cells..."
+techmap
+opt
 
-dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
+# Map flip-flops to ASAP7 sequential cells
+dfflibmap -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_FF_nldm_220123.lib
 
-abc -script +strash;scorr;ifraig;retime,{D};strash;dch,-f;map,-M,1,{D} -liberty /home/faiz/projects/Physical-Design/riscv-asap7/lib/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib
+opt
 
+# Replace undefined values with zeros before ABC
+setundef -zero
 
-#-------------------------------------------------------------------------------
-# Step 6: Clean up
-#-------------------------------------------------------------------------------
+# Map combinational logic using ABC with ASAP7 libraries
+# Using ORFS approach: multiple compressed liberty files + script + constraints
+# Libraries: AO (AND-OR), OA (OR-AND), INVBUF, SIMPLE, SEQ
+abc -script /home/faiz/OpenROAD-flow-scripts/flow/scripts/abc_speed.script \
+    -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_AO_RVT_FF_nldm_211120.lib.gz \
+    -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_INVBUF_RVT_FF_nldm_220122.lib.gz \
+    -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_OA_RVT_FF_nldm_211120.lib.gz \
+    -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_FF_nldm_211120.lib.gz \
+    -liberty /home/faiz/OpenROAD-flow-scripts/flow/platforms/asap7/lib/NLDM/asap7sc7p5t_SEQ_RVT_FF_nldm_220123.lib \
+    -D 2000
+
+# ===========================================================================
+# Step 5: Final cleanup
+# ===========================================================================
+
+# Split compound nets
+splitnets
 
 opt_clean -purge
 
-#-------------------------------------------------------------------------------
-# Step 7: Write netlist
-#-------------------------------------------------------------------------------
+# Replace any remaining generic cells with buffers
+# hilomap for tie cells
+hilomap -hicell TIEHIx1_ASAP7_75t_R H -locell TIELOx1_ASAP7_75t_R L
 
-log "Writing netlist..."
+# Insert buffers for pass-through wires
+insbuf -buf BUFx2_ASAP7_75t_R A Y
 
-write_verilog -noattr /home/faiz/projects/Physical-Design/riscv-asap7/results/riscv_soc/01_synthesis/riscv_soc_synth.v
+# ===========================================================================
+# Step 6: Verification and statistics
+# ===========================================================================
 
-#-------------------------------------------------------------------------------
-# Step 8: Reports
-#-------------------------------------------------------------------------------
-
-log "Generating statistics..."
-
+check
 stat
 
-log "=========================================="
-log "   Synthesis complete!"
-log "=========================================="
+# ===========================================================================
+# Step 7: Export netlist
+# ===========================================================================
+
+# -noexpr: don't use assign x = ~y; syntax (OpenROAD doesn't support it)
+# -noattr: remove attributes
+write_verilog -noattr -noexpr results/riscv_soc/01_synthesis/riscv_soc_synth.v
+
+# ===========================================================================
+# End of synthesis
+# ===========================================================================

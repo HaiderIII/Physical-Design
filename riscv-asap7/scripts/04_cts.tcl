@@ -1,13 +1,17 @@
 # ============================================================================
-# Phase 5: Clock Tree Synthesis (OpenROAD)
+# Phase 5: Clock Tree Synthesis (CTS) - ASAP7
+# ============================================================================
+# Tool: OpenROAD
+# Target: ASAP7 7nm FinFET
+# Frequency: 500 MHz (2ns period)
 # ============================================================================
 
 puts "=========================================="
-puts "   Phase 5: Clock Tree Synthesis (CTS)"
+puts "   Phase 5: Clock Tree Synthesis - ASAP7"
 puts "=========================================="
 
 #-------------------------------------------------------------------------------
-# Setup paths
+# Setup paths (BOILERPLATE - same for all phases)
 #-------------------------------------------------------------------------------
 
 set script_dir [file dirname [file normalize [info script]]]
@@ -18,7 +22,7 @@ puts "Project directory: $project_dir"
 puts "Platform directory: $platform_dir"
 
 #-------------------------------------------------------------------------------
-# Load LEF files (technology + cells)
+# Load LEF files (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
@@ -30,34 +34,33 @@ read_lef $platform_dir/lef/asap7sc7p5t_28_R_1x_220121a.lef
 puts "LEF files loaded."
 
 #-------------------------------------------------------------------------------
-# Load Liberty files (timing)
+# Load Liberty files (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
 puts "Loading Liberty files..."
 
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_TT_nldm_211120.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SEQ_RVT_TT_nldm_220123.lib
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_INVBUF_RVT_TT_nldm_220122.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_AO_RVT_TT_nldm_211120.lib.gz
-read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_OA_RVT_TT_nldm_211120.lib.gz
+read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SEQ_RVT_FF_nldm_220123.lib
+read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_SIMPLE_RVT_FF_nldm_211120.lib
+read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_INVBUF_RVT_FF_nldm_220122.lib
+read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_AO_RVT_FF_nldm_211120.lib
+read_liberty $platform_dir/lib/NLDM/asap7sc7p5t_OA_RVT_FF_nldm_211120.lib
 
 puts "Liberty files loaded."
 
 #-------------------------------------------------------------------------------
-# Load placement DEF
+# Load placement DEF (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Loading placement..."
+puts "Loading placement DEF..."
 
-read_def $project_dir/results/riscv_soc/03_placement/riscv_soc_placement.def
-
+read_def $project_dir/results/riscv_soc/03_placement/riscv_soc_placed.def
 
 puts "Placement loaded."
 
 #-------------------------------------------------------------------------------
-# Load timing constraints (SDC)
+# Load timing constraints (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
@@ -68,52 +71,92 @@ read_sdc $project_dir/constraints/design.sdc
 puts "SDC constraints loaded."
 
 #-------------------------------------------------------------------------------
-# Clock Tree Synthesis
+# Set wire RC for parasitics estimation (BOILERPLATE for ASAP7)
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Running clock tree synthesis..."
+puts "Setting wire RC..."
 
-# Set wire RC values (example values, adjust as needed)
-set_wire_rc -signal -resistance 0.0001 -capacitance 0.0001
-set_wire_rc -clock -resistance 0.0001 -capacitance 0.0001
+# Source ASAP7 RC settings
+source $platform_dir/setRC.tcl
 
-# ASAP7 clock buffers
-set root_buffer "BUFx24_ASAP7_75t_R"
-set buffer_list {BUFx2_ASAP7_75t_R BUFx4_ASAP7_75t_R BUFx8_ASAP7_75t_R BUFx12_ASAP7_75t_R}
+puts "Wire RC configured."
 
-# Run CTS with sink clustering
-clock_tree_synthesis -root_buf $root_buffer \
-                     -buf_list $buffer_list \
-                     -sink_clustering_enable \
-                     -sink_clustering_max_diameter 30 \
-                     -sink_clustering_size 15
+#===============================================================================
+# TODO: CLOCK TREE SYNTHESIS
+#===============================================================================
+# Your task: Complete the CTS commands below
+#
+# Concepts to understand:
+# - Clock buffers vs clock inverters
+# - Clock tree depth (number of buffer stages)
+# - Clock skew (difference in arrival times)
+# - Clock latency (time from source to sinks)
+#
+# Hints:
+# - Use 'clock_tree_synthesis' command
+# - Buffer cell for ASAP7: BUFx4_ASAP7_75t_R (or similar)
+# - Check available buffers: grep "BUF" in LEF file
+#===============================================================================
+
+puts ""
+puts "Running Clock Tree Synthesis..."
+
+# TODO 1: Configure CTS with appropriate buffer cell
+# Hint: set_wire_rc -clock ... (already done in setRC.tcl)
+# Hint: clock_tree_synthesis -buf_list {buffer_cell_name} -root_buf {root_buffer}
+
+# YOUR CODE HERE:
+# Note: Wire RC already configured by setRC.tcl above
+set root_buffer "BUFx12_ASAP7_75t_R"
+set buffer_list {
+    BUFx2_ASAP7_75t_R
+    BUFx3_ASAP7_75t_R
+    BUFx4_ASAP7_75t_R
+    BUFx5_ASAP7_75t_R
+    BUFx8_ASAP7_75t_R
+    BUFx10_ASAP7_75t_R
+    BUFx12_ASAP7_75t_R
+}
+
+clock_tree_synthesis -root_buf $root_buffer -buf_list $buffer_list
 
 
-estimate_parasitics -placement
 
-puts "Clock tree synthesis complete."
+puts "CTS complete."
 
 #-------------------------------------------------------------------------------
-# Estimate parasitics
+# TODO: Post-CTS optimization
 #-------------------------------------------------------------------------------
-puts "Parasitics estimated."
 
+puts ""
+puts "Running post-CTS optimization..."
+
+# TODO 2: Estimate parasitics and report timing
+# Hint: estimate_parasitics -placement
+# Hint: report_clock_skew
+
+# YOUR CODE HERE:
 estimate_parasitics -placement
 
 report_parasitic_annotation
+report_clock_skew
 
+puts "Post-CTS optimization complete."
 
 #-------------------------------------------------------------------------------
-# Repair clock nets
+# Reports (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Repairing clock nets..."
+puts "Generating reports..."
 
+# TODO 3: Add clock-specific reports
+# Hint: report_clock_skew
+# Hint: report_checks -path_delay max -through [get_clocks clk]
+
+report_design_area
 repair_clock_nets
-
-puts "Clock nets repaired."
 
 #-------------------------------------------------------------------------------
 # Re-legalize placement (buffers added)
@@ -127,29 +170,14 @@ detailed_placement
 puts "Placement re-legalized."
 
 #-------------------------------------------------------------------------------
-# Reports
-#-------------------------------------------------------------------------------
-
-puts ""
-puts "Generating reports..."
-
-report_clock_skew
-report_checks
-
-
-puts "Reports generated."
-
-#-------------------------------------------------------------------------------
-# Save CTS DEF
+# Save CTS result (BOILERPLATE)
 #-------------------------------------------------------------------------------
 
 puts ""
 puts "Saving CTS DEF..."
 
 file mkdir $project_dir/results/riscv_soc/04_cts
-write_def  $project_dir/results/riscv_soc/04_cts/riscv_soc_cts.def
-
-puts "DEF saved to results/riscv_soc/04_cts/riscv_soc_cts.def"
+write_def $project_dir/results/riscv_soc/04_cts/riscv_soc_cts.def
 
 puts "=========================================="
 puts "   CTS complete!"

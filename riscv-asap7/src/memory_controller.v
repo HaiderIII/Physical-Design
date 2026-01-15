@@ -1,6 +1,8 @@
 // ============================================================================
 // RISC-V Memory Controller - Load/Store Unit with byte/half/word support
 // ============================================================================
+// Project: RISC-V Physical Design with SKY130 + SRAM Macros
+// ============================================================================
 
 `include "riscv_pkg.v"
 
