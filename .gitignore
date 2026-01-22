@@ -26,3 +26,9 @@ Thumbs.db
 
 # Results that shouldn't be committed
 results/
+
+# Interview prep (personal)
+notes/*Interview*
+notes/*interview*
+*interview*.md
+*Interview*.md
