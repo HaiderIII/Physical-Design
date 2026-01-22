@@ -83,31 +83,41 @@ set_wire_rc -clock -layer M8
 
 puts "Wire RC configured."
 
-#===============================================================================
-# TODO: GLOBAL ROUTING
-#===============================================================================
-# Your task: Complete the global routing commands below
-#
-# Concepts to understand:
-# - Global routing: Creates routing guides (coarse grid)
-# - Metal layers: M1-M9 in ASAP7 (M1 lowest, M9 highest)
-# - Congestion: Too many wires in one area
-# - Overflow: When routing demand exceeds capacity
-#
-# Hints:
-# - Use 'global_route' command
-# - Check routing layers available in LEF
-# - Congestion report helps identify problem areas
-#===============================================================================
+#-------------------------------------------------------------------------------
+# Power Distribution Network (required before routing)
+#-------------------------------------------------------------------------------
+
+puts ""
+puts "Setting up power distribution..."
+
+# Add global connections for power/ground (ASAP7 pin names)
+add_global_connection -net VDD -pin_pattern "^VDD$" -power
+add_global_connection -net VSS -pin_pattern "^VSS$" -ground
+
+# Connect all power pins globally
+global_connect
+
+# Fix tie-cell nets incorrectly marked as POWER/GROUND
+# The 'one_' and 'zero_' nets are logic constants, not power rails
+set block [ord::get_db_block]
+foreach net [$block getNets] {
+    set net_name [$net getName]
+    set sig_type [$net getSigType]
+    if {($sig_type == "POWER" || $sig_type == "GROUND") &&
+        ([string match "*one_*" $net_name] || [string match "*zero_*" $net_name])} {
+        puts "Reclassifying tie net: $net_name from $sig_type to SIGNAL"
+        $net setSigType "SIGNAL"
+    }
+}
+
+puts "Power distribution setup complete."
+
+#-------------------------------------------------------------------------------
+# Global routing
+#-------------------------------------------------------------------------------
 
 puts ""
 puts "Running Global Routing..."
-
-# TODO 1: Configure and run global routing
-# Hint: global_route -guide_file <output_guide> -congestion_iterations <N>
-# Hint: For ASAP7, layers M2-M7 are typically used for signal routing
-
-# YOUR CODE HERE:
 
 # Signal routing on M2-M7, clock on M6-M7 (within allowed range)
 set_routing_layers -signal M2-M7 -clock M6-M7
@@ -116,46 +126,28 @@ global_route -congestion_iterations 30
 
 puts "Global routing complete."
 
-#===============================================================================
-# TODO: DETAILED ROUTING
-#===============================================================================
-# Your task: Complete the detailed routing commands below
-#
-# Concepts to understand:
-# - Detailed routing: Creates actual metal wires following guides
-# - DRC: Design Rule Check (spacing, width violations)
-# - Via: Vertical connection between metal layers
-# - Antenna effect: Long wires can damage transistor gates
-#
-# Hints:
-# - Use 'detailed_route' command
-# - May need multiple iterations to fix DRC violations
-#===============================================================================
+#-------------------------------------------------------------------------------
+# Detailed routing
+#-------------------------------------------------------------------------------
 
 puts ""
 puts "Running Detailed Routing..."
-
-# TODO 2: Run detailed routing
-# Hint: detailed_route -output_drc <drc_report>
-# Hint: Check for DRC violations in the report
-
-# YOUR CODE HERE:
 
 detailed_route
 
 puts "Detailed routing complete."
 
 #-------------------------------------------------------------------------------
-# Post-routing optimization (BOILERPLATE)
+# Save routed DEF (before reports to avoid losing work if reports fail)
 #-------------------------------------------------------------------------------
 
 puts ""
-puts "Running post-routing optimization..."
+puts "Saving routed DEF..."
 
-# Estimate final parasitics
-estimate_parasitics -global_routing
+file mkdir $project_dir/results/riscv_soc/05_routing
+write_def $project_dir/results/riscv_soc/05_routing/riscv_soc_routed.def
 
-puts "Post-routing optimization complete."
+puts "DEF saved to results/riscv_soc/05_routing/riscv_soc_routed.def"
 
 #-------------------------------------------------------------------------------
 # Reports
@@ -164,24 +156,10 @@ puts "Post-routing optimization complete."
 puts ""
 puts "Generating reports..."
 
-# TODO 3: Add routing-specific reports
-# Hint: report_design_area
-# Hint: report_routing_layers (if available)
-# Hint: report_checks -path_delay max (timing after routing)
-
-# YOUR CODE HERE:
+report_timing
 report_design_area
 
-
-#-------------------------------------------------------------------------------
-# Save routed result (BOILERPLATE)
-#-------------------------------------------------------------------------------
-
-puts ""
-puts "Saving routed DEF..."
-
-file mkdir $project_dir/results/riscv_soc/05_routing
-write_def $project_dir/results/riscv_soc/05_routing/riscv_soc_routed.def
+puts "Reports generated."
 
 puts "=========================================="
 puts "   Routing complete!"
