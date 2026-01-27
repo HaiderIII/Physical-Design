@@ -1,188 +1,231 @@
-# Physical Design Learning Platform
+# Physical Design: RTL to GDSII
 
-> Master chip design from RTL to GDSII using open-source tools
-
----
-
-## Overview
-
-This repository provides a complete learning platform for **Physical Design** of digital integrated circuits. It combines theoretical lessons, interactive puzzle challenges, and a complete working project to teach the full PD flow.
-
-### What You'll Learn
-
-- Complete Physical Design flow (Synthesis to GDSII)
-- TCL scripting for EDA tools
-- OpenROAD, Yosys, and OpenSTA usage
-- Timing analysis and optimization
-- Debug and troubleshooting skills
+Complete RTL-to-GDSII implementations using open-source EDA tools across three process nodes (7nm, 45nm, 130nm).
 
 ---
 
-## Repository Structure
+## Projects
+
+### RISC-V RV32I — Sky130 (130nm)
+
+5-stage pipelined RISC-V processor with real OpenRAM SRAM macros.
+
+| Metric | Value |
+|--------|-------|
+| Target Frequency | 100 MHz |
+| Total Area | 1.55 mm² |
+| Total Cells | 9,804 |
+| Power | 90.3 mW |
+| WNS (Setup) | -0.05 ns |
+| WNS (Hold) | +0.07 ns |
+| SRAM | 2× 4KB OpenRAM macros |
+| Status | **Complete** (Synthesis → Signoff) |
+
+<p align="center">
+  <img src="riscv-sky130/docs/images/02_floorplan/floorplan.png" width="32%" alt="Floorplan"/>
+  <img src="riscv-sky130/docs/images/05_routing/routing.png" width="32%" alt="Routing"/>
+  <img src="riscv-sky130/docs/images/06_signoff/signoff.png" width="32%" alt="Signoff"/>
+</p>
 
 ```
-Physical-Design/
-├── phases/                    # Sequential learning path
-│   ├── phase_00_foundations/  # TCL basics & OpenSTA intro
-│   └── phase1_floorplanning/  # Die/Core concepts
-│
-├── pd-puzzles/                # Interactive puzzle challenges
-│   ├── tcl_fundamentals/      # TCL crash course
-│   ├── puzzles/               # 6 puzzle categories
-│   └── common/pdks/           # Nangate45 PDK
-│
-├── project_alu8bits/          # Complete RTL-to-GDSII example
-│   ├── designs/               # 8-bit ALU RTL & constraints
-│   ├── scripts/               # Full flow scripts (7 phases)
-│   └── results/               # Generated outputs
-│
-├── install_eda.sh             # EDA tools installation script
-└── physical_design_questions_answers.md  # Interview Q&A reference
+riscv-sky130/
+├── src/          # 11 Verilog modules (core + SRAM wrappers)
+├── scripts/      # 01_synthesis.ys → 06_signoff.tcl
+├── constraints/  # SDC (100 MHz)
+├── results/      # DEF, netlists, reports
+└── docs/         # Screenshots, quizzes
+```
+
+### RISC-V RV32I — ASAP7 (7nm)
+
+Same pipeline targeting 500 MHz on a 7nm FinFET node. SRAM synthesized to flip-flops (no ASAP7 SRAM macro available).
+
+| Metric | Value |
+|--------|-------|
+| Target Frequency | 500 MHz |
+| Design Area | 19,106 µm² |
+| Total Cells | 164,673 |
+| Clock Skew | 35 ps |
+| CTS Buffers | 6,303 |
+| CTS Depth | 8 levels |
+| Status | **Complete through CTS** (Phase 5/7) |
+
+<p align="center">
+  <img src="riscv-asap7/docs/images/03_placement/placement.png" width="45%" alt="Placement"/>
+  <img src="riscv-asap7/docs/images/04_cts/cts.png" width="45%" alt="CTS"/>
+</p>
+
+```
+riscv-asap7/
+├── src/          # 10 Verilog modules (core + fake SRAM)
+├── scripts/      # 01_synthesis.ys → 06_signoff.tcl
+├── constraints/  # SDC (500 MHz)
+├── results/      # DEF, netlists, reports
+└── docs/         # Screenshots, quizzes
+```
+
+### 8-bit ALU — Sky130 (130nm)
+
+Simple educational design — complete RTL-to-GDSII flow.
+
+| Metric | Value |
+|--------|-------|
+| Frequency | 50 MHz |
+| Area | 1,485 µm² |
+| Cells | 214 |
+| Power | 56 µW |
+| Setup Slack | +15.19 ns |
+| Status | **Complete** (RTL → GDSII) |
+
+<p align="center">
+  <img src="project_alu8bits/results/alu_8bit/08_gdsii/image/gdsii.png" width="50%" alt="GDSII"/>
+</p>
+
+```
+project_alu8bits/
+├── designs/      # RTL (alu_8bit.v) + SDC constraints
+├── scripts/      # 01_synthesis.tcl → 08_gdsii_export.sh
+└── results/      # Outputs for all 8 phases
 ```
 
 ---
 
-## Learning Paths
+## RISC-V Architecture
 
-### Path 1: Structured Learning (phases/)
+Both RISC-V projects share the same 5-stage pipeline:
 
-Follow sequential lessons with theory and exercises:
+```
+riscv_soc
+├── riscv_core
+│   ├── IF  — Instruction Fetch
+│   ├── ID  — Decode + Register File (32×32)
+│   ├── EX  — ALU + Branch Unit
+│   ├── MEM — Memory Access
+│   └── WB  — Write Back
+│   └── Hazard Detection + Data Forwarding
+├── IMEM (4KB Instruction Memory)
+├── DMEM (4KB Data Memory)
+└── GPIO (32-bit)
+```
+
+| Feature | Sky130 | ASAP7 |
+|---------|--------|-------|
+| Process | 130nm CMOS | 7nm FinFET |
+| VDD | 1.8V | 0.7V |
+| Clock | 100 MHz | 500 MHz |
+| Metal Layers | 5 (li1–met5) | 9 (M1–M9) |
+| SRAM | Real macros (OpenRAM) | Synthesized (flip-flops) |
+
+---
+
+## PDKs
+
+| PDK | Node | Source | Used In |
+|-----|------|--------|---------|
+| **ASAP7** | 7nm FinFET | Arizona State University | riscv-asap7 |
+| **Nangate45** | 45nm | Si2 (open-source) | pd-puzzles |
+| **Sky130** | 130nm | SkyWater / Google | riscv-sky130, ALU project |
+
+---
+
+## Learning Resources
+
+### Structured Lessons (`phases/`)
 
 | Phase | Topic | Content |
 |-------|-------|---------|
-| Phase 0 | Foundations | TCL scripting, OpenSTA basics |
-| Phase 1 | Floorplanning | Die/Core, utilization, aspect ratio |
+| Phase 0 | Foundations | TCL scripting (7 lessons), OpenSTA basics (6 exercises) |
+| Phase 1 | Floorplanning | Die/Core area, utilization, I/O placement |
 
-```bash
-cd phases/phase_00_foundations
-cat README.md
-```
+### PD Puzzles (`pd-puzzles/`)
 
-### Path 2: Puzzle Challenges (pd-puzzles/)
+30 interactive debugging challenges across 6 categories, with progressive difficulty (Beginner → Intermediate → Advanced):
 
-Learn by debugging real-world problems:
+| Category | Puzzles | Example |
+|----------|---------|---------|
+| Synthesis | 5 | Missing library, multi-corner PVT, multi-Vt |
+| Floorplanning | 5 | PDN setup, halos, density management |
+| Placement | 5 | Density control, timing-driven, padding |
+| CTS | 5 | Buffer selection, sink clustering, skew |
+| Routing | 5 | Layer config, NDR rules, congestion |
+| Signoff | 5 | STA constraints, multi-corner, DRC |
 
-| Category | Puzzles | Focus |
-|----------|---------|-------|
-| Synthesis | syn_001 | Library configuration |
-| Floorplan | flp_001 | Die area sizing |
-| Placement | plc_001 | Density management |
-| CTS | cts_001 | Clock skew optimization |
-| Routing | rte_001 | Layer configuration |
-| Sign-off | sgn_001 | Timing analysis |
+Each puzzle includes: `PROBLEM.md` → `run.tcl` (with TODOs) → `hints.md` → `QUIZ.md` → `.solution/`
 
-```bash
-cd pd-puzzles
-cat README.md
-```
+### Study Notes (`notes/`)
 
-### Path 3: Complete Project (project_alu8bits/)
-
-See the full flow in action with an 8-bit ALU:
-
-```bash
-cd project_alu8bits
-./scripts/run_flow.sh
-```
+Comprehensive notes covering each stage of the PD flow and TCL scripting (kept locally, not tracked in git).
 
 ---
 
-## Prerequisites
+## Tools
 
-### Required Tools
+| Tool | Version | Purpose |
+|------|---------|---------|
+| **OpenROAD** | Latest | Floorplanning, placement, CTS, routing |
+| **Yosys** | Latest | Logic synthesis (RTL → gate-level) |
+| **OpenSTA** | Latest | Static timing analysis |
+| **KLayout** | Latest | GDSII visualization |
+| **Docker** | Optional | Containerized tool environment |
 
-| Tool | Purpose |
-|------|---------|
-| OpenROAD | Complete PD flow |
-| Yosys | Logic synthesis |
-| OpenSTA | Static timing analysis |
-| TCL 8.6+ | Scripting |
-
-### Installation
+### Setup
 
 ```bash
-# Install all EDA tools
-./install_eda.sh
+# Option 1: Docker (recommended)
+./docker_openroad.sh openroad
 
-# Verify installation
+# Option 2: Native install
+# See OpenROAD installation guide:
+# https://openroad.readthedocs.io/en/latest/user/Build.html
+
+# Verify tools
 openroad -version
 yosys -version
-sta -version
 ```
 
-### Optional Tools
+### Docker Usage
 
-- **Magic** - Layout visualization
-- **KLayout** - GDSII viewing
-
----
-
-## Quick Start
-
-### Option A: Start with Foundations
 ```bash
-cd phases/phase_00_foundations/cours
-cat 01_tcl_basics.md
-```
-
-### Option B: Jump into Puzzles
-```bash
-cd pd-puzzles/puzzles/01_synthesis/syn_001
-cat PROBLEM.md
-openroad run.tcl
-```
-
-### Option C: Run the Complete Flow
-```bash
-cd project_alu8bits
-./check_tools.sh
-./scripts/run_flow.sh
+./docker_openroad.sh                         # Interactive shell
+./docker_openroad.sh openroad script.tcl     # Run a TCL script
+./docker_openroad.sh yosys script.ys         # Run synthesis
 ```
 
 ---
 
-## Process Design Kits (PDKs)
-
-| PDK | Node | Location | Usage |
-|-----|------|----------|-------|
-| Nangate45 | 45nm | pd-puzzles/common/pdks/ | Puzzles |
-| Sky130 | 130nm | ~/.volare/ | ALU project |
-
----
-
-## Physical Design Flow Overview
+## Physical Design Flow
 
 ```
 RTL (Verilog)
     │
     ▼
 ┌─────────────┐
-│  Synthesis  │  → Gate-level netlist
+│  Synthesis   │  Yosys — RTL → gate-level netlist
 └─────────────┘
     │
     ▼
 ┌─────────────┐
-│ Floorplan   │  → Die/Core area, IO placement
+│ Floorplan    │  OpenROAD — die/core area, macros, I/O, PDN
 └─────────────┘
     │
     ▼
 ┌─────────────┐
-│  Placement  │  → Standard cell positioning
+│  Placement   │  OpenROAD — standard cell positioning, optimization
 └─────────────┘
     │
     ▼
 ┌─────────────┐
-│     CTS     │  → Clock tree synthesis
+│     CTS      │  OpenROAD — clock tree, buffer insertion, skew
 └─────────────┘
     │
     ▼
 ┌─────────────┐
-│   Routing   │  → Metal interconnects
+│   Routing    │  OpenROAD — global + detailed routing, DRC fix
 └─────────────┘
     │
     ▼
 ┌─────────────┐
-│  Sign-off   │  → STA, DRC, LVS verification
+│  Sign-off    │  OpenSTA — STA, power, DRC, LVS, antenna, EM
 └─────────────┘
     │
     ▼
@@ -191,22 +234,40 @@ RTL (Verilog)
 
 ---
 
-## Additional Resources
+## Repository Structure
 
-- [physical_design_questions_answers.md](physical_design_questions_answers.md) - Junior PD interview prep (28 Q&A)
+```
+Physical-Design/
+│
+├── riscv-sky130/              # RISC-V on Sky130 (130nm) — COMPLETE
+├── riscv-asap7/               # RISC-V on ASAP7 (7nm)   — Through CTS
+├── project_alu8bits/          # 8-bit ALU on Sky130      — COMPLETE (RTL→GDSII)
+│
+├── phases/                    # Structured learning path
+│   ├── phase_00_foundations/  #   TCL scripting + OpenSTA
+│   └── phase1_floorplanning/  #   Die/core concepts
+│
+├── pd-puzzles/                # 30 interactive challenges
+│   ├── puzzles/               #   6 categories × 5 levels
+│   ├── tcl_fundamentals/      #   TCL crash course
+│   └── common/pdks/nangate45/ #   Nangate45 PDK
+│
+├── notes/                     # Study notes (local only)
+├── docker_openroad.sh         # Docker integration
+└── view_layout.sh             # KLayout visualization
+```
+
+---
+
+## Resources
+
 - [OpenROAD Documentation](https://openroad.readthedocs.io/)
-- [Yosys Manual](https://yosyshq.net/yosys/)
+- [Yosys Manual](https://yosyshq.readthedocs.io/)
+- [Sky130 PDK](https://skywater-pdk.readthedocs.io/)
+- [ASAP7 PDK Reference](https://asap.asu.edu/asap/)
 
 ---
 
-## Contact
+## Author
 
-**Maintainer:** Faiz MOHAMMAD
-**Email:** faiz.mohammad.pro@protonmail.com
-**GitHub:** [HaiderIII](https://github.com/HaiderIII)
-
----
-
-## License
-
-MIT License - see LICENSE file for details
+**Faiz MOHAMMAD** — [GitHub](https://github.com/HaiderIII) — faiz.mohammad.pro@protonmail.com
