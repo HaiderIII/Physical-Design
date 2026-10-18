@@ -134,6 +134,17 @@ puts "Power distribution setup complete."
 
 
 #-------------------------------------------------------------------------------
+# Performance: Enable multi-threading
+#-------------------------------------------------------------------------------
+
+puts ""
+puts "Enabling multi-threading..."
+
+# Use all available CPU cores for faster routing
+set_thread_count [exec nproc]
+puts "Using [exec nproc] threads for routing."
+
+#-------------------------------------------------------------------------------
 # Global routing
 #-------------------------------------------------------------------------------
 
@@ -163,6 +174,9 @@ puts "Detailed routing complete."
 puts ""
 puts "Generating reports..."
 
+# Create output directory first
+file mkdir $project_dir/results/riscv_soc/05_routing
+
 report_timing -path_type full_clock -delay_type max -sort_by slack -nworst 10 -output $project_dir/results/riscv_soc/05_routing/timing_report.txt
 report_drc -output $project_dir/results/riscv_soc/05_routing/drc_report.txt
 report_routing -output $project_dir/results/riscv_soc/05_routing/routing_report.txt
@@ -177,7 +191,6 @@ puts "Reports generated."
 puts ""
 puts "Saving routed DEF..."
 
-file mkdir $project_dir/results/riscv_soc/05_routing
 write_def $project_dir/results/riscv_soc/05_routing/riscv_soc_routed.def
 
 puts "DEF saved to results/riscv_soc/05_routing/riscv_soc_routed.def"
